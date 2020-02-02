@@ -1,0 +1,2 @@
+var _interopRequireDefault=require("@babel/runtime/helpers/interopRequireDefault");var _interopRequireWildcard=require("@babel/runtime/helpers/interopRequireWildcard");Object.defineProperty(exports,"__esModule",{value:true});exports.default=useTheme;var React=_interopRequireWildcard(require("react"));var _ThemeContext=_interopRequireDefault(require("./ThemeContext"));function useTheme(){var theme=React.useContext(_ThemeContext.default);return theme;}
+//# sourceMappingURL=useTheme.js.map

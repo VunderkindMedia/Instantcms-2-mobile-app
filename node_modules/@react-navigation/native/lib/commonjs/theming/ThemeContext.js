@@ -1,0 +1,2 @@
+var _interopRequireDefault=require("@babel/runtime/helpers/interopRequireDefault");var _interopRequireWildcard=require("@babel/runtime/helpers/interopRequireWildcard");Object.defineProperty(exports,"__esModule",{value:true});exports.default=void 0;var React=_interopRequireWildcard(require("react"));var _DefaultTheme=_interopRequireDefault(require("./DefaultTheme"));var ThemeContext=React.createContext(_DefaultTheme.default);var _default=ThemeContext;exports.default=_default;
+//# sourceMappingURL=ThemeContext.js.map
