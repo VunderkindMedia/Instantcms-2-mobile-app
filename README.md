@@ -1,2 +1,2 @@
-# Instantcms-2-mobile-and-web-app
+# Instantcms-2-mobile-app
 Приложение для InstantCMS 2
