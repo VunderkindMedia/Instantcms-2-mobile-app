@@ -15,7 +15,7 @@ export function DrawerItems({
   activeLabelStyle,
   inactiveLabelStyle
 }) {
-  const { settings } = useContext(AppContext);
+  const { settings, showLoader } = useContext(AppContext);
   return state.routes.map((route, i) => {
     const focused = i === state.index;
 
@@ -46,8 +46,9 @@ export function DrawerItems({
           focused ? { color: "#fff" } : { color: settings.options.main_color }
         ]}
         onPress={() => {
-          navigation.closeDrawer();
-          !focused ? navigation.navigate(route.name) : null;
+          showLoader();
+
+          !focused ? navigation.navigate(route.name) : navigation.closeDrawer();
         }}
       />
     );

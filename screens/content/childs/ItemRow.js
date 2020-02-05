@@ -34,10 +34,15 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
           <ImageBackground
             imageStyle={{ borderRadius: 4 }}
             source={{
-              uri: data.item.photo
-                ? data.item.photo.normal
-                : "https://www.agsat.com.ua/images/no-photo.gif"
+              uri:
+                data.item.photo && data.item.photo.big
+                  ? data.item.photo.big
+                  : "https://www.exclusivehomedesign.it/wp-content/uploads/2018/07/noPhoto.png",
+              cache: "force-cache"
             }}
+            onLoad={() => {}}
+            onLoadStart={() => {}}
+            onLoadEnd={() => {}}
             style={styles.Image}
           >
             <View style={styles.HeaderView}>

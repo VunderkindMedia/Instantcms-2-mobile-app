@@ -1,8 +1,7 @@
-import React, { useReducer, useContext, useEffect, useCallback } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import {
   View,
   Text,
-  Button,
   ActivityIndicator,
   StyleSheet,
   FlatList
@@ -13,81 +12,111 @@ import { ItemRow } from "./childs/ItemRow";
 import { ErrorView } from "./ErrorView";
 import { Ionicons } from "@expo/vector-icons";
 
+import { useFocusEffect } from "@react-navigation/native";
+
 export const List = ({ navigation, route }) => {
   const {
+    reaching,
     settings,
-    loading,
-    showLoader,
-    hideLoader,
+    get_items_list,
     itemsList,
     error,
-
-    get_items_list
+    showLoader,
+    loading,
+    lazy,
+    paging,
+    ctype_title,
+    showRefreshLoader,
+    showLazyLoader
   } = useContext(AppContext);
 
-  navigation.setOptions({
-    headerLeft: () => (
-      <Ionicons
-        onPress={() => navigation.toggleDrawer()}
-        name="ios-menu"
-        size={20}
-        style={{ marginLeft: 10 }}
-        color={settings.options.main_color}
-      />
-    )
-  });
+  var page = 1;
 
-  const loadItems = useCallback(async () => await get_items_list(route.name), [
-    get_items_list
-  ]);
+  const [renderMain, setRenderMain] = useState(false);
 
-  useEffect(() => {
-    showLoader(true);
-    loadItems();
-    navigation.setOptions({ title: "" });
-  }, []);
+  const isRefresh = () => {
+    page = 1;
+    showRefreshLoader();
+    get_items_list(route.name, page, true);
+  };
 
-  if (itemsList.additionally && !loading) {
-    console.log(itemsList.additionally.ctype.title);
-    navigation.setOptions({ title: itemsList.additionally.ctype.title });
-    return (
-      <View style={styles.container}>
+  const moreLoad = () => {
+    page++;
+    showLazyLoader();
+    console.log("page", page);
+    get_items_list(route.name, page);
+  };
+
+  setTimeout(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Ionicons
+          onPress={() => navigation.toggleDrawer()}
+          name="ios-menu"
+          size={24}
+          style={{ marginLeft: 10 }}
+          color={settings.options.main_color}
+        />
+      )
+    });
+  }, 0);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTimeout(() => {
+        setRenderMain(true);
+      }, 0);
+      get_items_list(route.params.ctype, page);
+    }, [])
+  );
+
+  return (
+    <View style={styles.container}>
+      {loading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator />
+        </View>
+      )}
+
+      {!loading && itemsList.length === 0 && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Нет ни одной записи</Text>
+        </View>
+      )}
+      {error && <ErrorView handle={showLoader} />}
+      {!loading && renderMain && (
         <FlatList
-          data={itemsList.items}
-          // refreshing={}
-          // onRefresh={}
-          onEndReached={() => {}}
+          data={itemsList}
+          refreshing={reaching}
+          onRefresh={() => {
+            isRefresh();
+          }}
+          onEndReached={() => {
+            if (paging.has_next && !lazy) {
+              moreLoad();
+            }
+          }}
           onEndReachedThreshold={0.5}
           renderItem={item => (
             <ItemRow
               data={item}
               ctype={route.name}
               navigation={navigation}
-              title={itemsList.additionally.ctype.title}
+              title={ctype_title}
             />
           )}
+          initialNumToRender={2}
           keyExtractor={(item, index) => String(index)}
           ListFooterComponent={RenderFooter}
         />
-      </View>
-    );
-  } else if (itemsList.length === 0 && !loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Нет ни одной записи</Text>
-      </View>
-    );
-  } else if (error) {
-    return <ErrorView handle={showLoader} />;
-  } else {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
+      )}
+    </View>
+  );
 };
-
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: 5 }
 });

@@ -24,7 +24,12 @@ export function ContentStack({ navigation, route }) {
         headerTintColor: settings.options.main_color
       }}
     >
-      <Stack.Screen name={route.name} component={List} />
+      <Stack.Screen
+        name={route.name}
+        component={List}
+        initialParams={{ ctype: route.params.ctype }}
+        options={{ title: route.params.title }}
+      />
       <Stack.Screen name={route.name + "Item"} component={Item} />
     </Stack.Navigator>
   );
@@ -65,6 +70,7 @@ function DrawerMenu() {
           key={id}
           name={settings.menu[id].url.split("#")[0]}
           component={AuthStack}
+          initialParams={{ title: "Авторизация" }}
           options={{ drawerLabel: settings.menu[id].title }}
         />,
         ...initial_menu
@@ -77,6 +83,10 @@ function DrawerMenu() {
           name={settings.menu[id].url.split("#")[0]}
           component={ContentStack}
           options={{ drawerLabel: settings.menu[id].title }}
+          initialParams={{
+            ctype: settings.menu[id].url.split("#")[0],
+            title: settings.menu[id].title
+          }}
         />
       ];
     }
@@ -88,8 +98,6 @@ function DrawerMenu() {
         width: 240,
         activeBackgroundColor: "#000"
       }}
-      drawerType="slide"
-      unmountInactiveScreens={true}
       initialRouteName={settings.options.start_page}
       drawerContent={props => <DrawerContent {...props} />}
     >
@@ -98,7 +106,8 @@ function DrawerMenu() {
         key="last"
         name="settings"
         component={SettingsStack}
-        options={{ drawerLabel: "Настройки" }}
+        initialParams={{ title: "Настройки" }}
+        // options={{ drawerLabel: "Настройки" }}
       />
     </Drawer.Navigator>
   );

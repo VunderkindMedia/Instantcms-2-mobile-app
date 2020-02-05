@@ -10,7 +10,12 @@ import {
   GET_ICMS2_SETTINGS,
   GET_CONTENT_ITEMS,
   GET_CONTENT_ITEM,
-  CLEAR_CONTENT_ITEMS
+  CLEAR_CONTENT_ITEMS,
+  GET_MORE_CONTENT_ITEMS,
+  SHOW_REFRESH_LOADER,
+  HIDE_REFRESH_LOADER,
+  SHOW_LAZY_LOADER,
+  HIDE_LAZY_LOADER
 } from "./types";
 
 export const AppState = ({ children }) => {
@@ -19,6 +24,14 @@ export const AppState = ({ children }) => {
   const showLoader = () => dispatch({ type: SHOW_LOADER });
 
   const hideLoader = () => dispatch({ type: HIDE_LOADER });
+
+  const showRefreshLoader = () => dispatch({ type: SHOW_REFRESH_LOADER });
+
+  const hideRefreshLoader = () => dispatch({ type: HIDE_REFRESH_LOADER });
+
+  const showLazyLoader = () => dispatch({ type: SHOW_LAZY_LOADER });
+
+  const hideLazyLoader = () => dispatch({ type: HIDE_LAZY_LOADER });
 
   const showError = error => dispatch({ type: SHOW_ERROR, error });
 
@@ -44,28 +57,65 @@ export const AppState = ({ children }) => {
   };
 
   //CONTENT
-  const get_items_list = async ctype => {
-    showLoader();
-    clearContentItems();
+  const get_items_list = async (ctype, page, refresh = false) => {
+    console.log(page);
+    console.log(refresh);
+    var url;
+
+    if (page) {
+      url =
+        BASE_URL +
+        "/api/method/content.get." +
+        ctype +
+        "?api_key=" +
+        API_KEY +
+        "&page=" +
+        page;
+    } else {
+      url =
+        BASE_URL + "/api/method/content.get." + ctype + "?api_key=" + API_KEY;
+    }
+    if (!page && !refresh) {
+      showLoader();
+    }
+
     clearError();
     try {
-      const response = await fetch(
-        BASE_URL + "/api/method/content.get." + ctype + "?api_key=" + API_KEY,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" }
-        }
-      );
+      const response = await fetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
       const data = await response.json();
 
-      dispatch({ type: GET_CONTENT_ITEMS, itemsList: data.response });
+      if (page > 1) {
+        dispatch({
+          type: GET_MORE_CONTENT_ITEMS,
+          itemsList: data.response.items,
+          additionally: data.response.additionally,
+          ctype_title: data.response.ctype_title,
+          paging: data.response.paging
+        });
+      } else {
+        dispatch({
+          type: GET_CONTENT_ITEMS,
+          itemsList: data.response.items,
+          additionally: data.response.additionally,
+          ctype_title: data.response.ctype_title,
+          paging: data.response.paging
+        });
+      }
     } catch (e) {
       showError();
       console.log(e);
     } finally {
+      refresh = false;
+      hideRefreshLoader();
+      hideLazyLoader();
       hideLoader();
     }
   };
+
   const get_item = async (ctype, item_id) => {
     clearError();
     showLoader();
@@ -102,13 +152,21 @@ export const AppState = ({ children }) => {
         settings: state.settings,
         loading: state.loading,
         error: state.error,
+        lazy: state.lazy,
         showLoader,
         hideLoader,
+        showError,
         get_icms2_settings,
         get_items_list,
         get_item,
+        showRefreshLoader,
+        showLazyLoader,
         itemsList: state.itemsList,
-        item_res: state.item_res
+        additionally: state.additionally,
+        paging: state.paging,
+        ctype_title: state.ctype_title,
+        item_res: state.item_res,
+        reaching: state.reaching
       }}
     >
       {children}
