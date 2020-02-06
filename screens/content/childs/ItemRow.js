@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   TouchableOpacity
 } from "react-native";
+import HTML from "react-native-render-html";
 import { Ionicons } from "@expo/vector-icons";
 import { formattingDate } from "../../../utils/utils";
 import JsxParser from "react-jsx-parser";
@@ -35,8 +36,8 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
             imageStyle={{ borderRadius: 4 }}
             source={{
               uri:
-                data.item.photo && data.item.photo.big
-                  ? data.item.photo.big
+                data.item.photo && data.item.photo.normal
+                  ? data.item.photo.normal
                   : "https://www.exclusivehomedesign.it/wp-content/uploads/2018/07/noPhoto.png",
               cache: "force-cache"
             }}
@@ -144,6 +145,8 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
               source={{
                 uri: data.item.photo
                   ? data.item.photo.small
+                  : data.item.picture
+                  ? data.item.picture.normal
                   : "https://www.exclusivehomedesign.it/wp-content/uploads/2018/07/noPhoto.png"
               }}
               style={styles.ImageLeft}
@@ -239,6 +242,9 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
           ...data.item,
           date_pub: formattingDate(data.item.date_pub),
           main_color: settings.options.main_color,
+          teaser: data.item.teaser
+            ? data.item.teaser.replace(/<[^>]+>/g, "")
+            : null,
           myHandler: () => goToItem()
         }}
         blacklistedAttrs={null}
@@ -254,7 +260,9 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
           Ionicons,
           Card,
           Image,
-          TouchableOpacity
+          TouchableOpacity,
+          ImageBackground,
+          HTML
         }}
         jsx={settings.options["template_custom_list_" + ctype]}
       />

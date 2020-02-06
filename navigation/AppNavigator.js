@@ -107,7 +107,7 @@ function DrawerMenu() {
         name="settings"
         component={SettingsStack}
         initialParams={{ title: "Настройки" }}
-        // options={{ drawerLabel: "Настройки" }}
+        options={{ drawerLabel: "Настройки" }}
       />
     </Drawer.Navigator>
   );

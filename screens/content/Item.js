@@ -95,11 +95,13 @@ export const Item = ({ route, navigation }) => {
   };
 
   if (!loading) {
-    if (item_res.item.photo) {
+    if (item_res.item.photo && item_res.item.photo.normal) {
       images = [...images, item_res.item.photo.normal];
-      for (uris in item_res.item.photos) {
+      for (var uris in item_res.item.photos) {
         images = [...images, item_res.item.photos[uris].big];
       }
+    } else if (route.params.ctype === "posts" && item_res.item.picture.normal) {
+      images = [...images, item_res.item.picture.normal];
     }
 
     for (var key in item_res.additionally.fields) {
@@ -109,7 +111,8 @@ export const Item = ({ route, navigation }) => {
         key !== "user" &&
         key !== "date_pub" &&
         key !== "content" &&
-        key !== "title"
+        key !== "title" &&
+        key !== "picture"
       ) {
         if (item_res.additionally.fields[key].is_in_item === "1") {
           fields = [
@@ -133,7 +136,9 @@ export const Item = ({ route, navigation }) => {
     return (
       <ScrollView>
         <SliderBox
-          key={item_res.item.photo}
+          key={
+            item_res.item.photo ? item_res.item.photo : item_res.item.picture
+          }
           images={images}
           imageLoadingColor="#2196F3"
         />
