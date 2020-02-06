@@ -100,7 +100,7 @@ export const Item = ({ route, navigation }) => {
       for (var uris in item_res.item.photos) {
         images = [...images, item_res.item.photos[uris].big];
       }
-    } else if (route.params.ctype === "posts" && item_res.item.picture.normal) {
+    } else if (route.params.ctype === "posts" && item_res.item.picture) {
       images = [...images, item_res.item.picture.normal];
     }
 
