@@ -66,7 +66,9 @@ https://yadi.sk/d/_EnE3EKTmCnjSg
 
 Добавить меню, по аналогии:
 
-![Image description](https://downloader.disk.yandex.ru/preview/29937321fa695a0ae8bc0f2c4a7b0082ff3b7f0ebd5e74a2f57f242797da5a30/5e3c383c/n-gAsaJReYt4gS7faweLPFlTPTR1lIHcD1YDefTKS5HJhqj8Mzfem1Is7WY5npF3iHGLxh3IrZqTeXpyVN044w==?uid=974718561&filename=Снимок+экрана+2020-02-06+в+22.49.04.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&tknv=v2&owner_uid=1130000023692780&size=2048x2048)
+![Image description](https://downloader.disk.yandex.ru/preview/eff27dd194a2f582f0d23d01b5d5812e888426a572c47bf2afa82c15760a89c4/5e3c391a/5SBvsFU3GOVZyHD4E6MoALW0Xw_T7Z17I7OBqsGGlncJYP_07f-aGukgxz4UYyrY6Dd-4cT3SU4B4OP1T_hQnw==?uid=1130000023692780&filename=Снимок+экрана+2020-02-06+в+23.03.41.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&tknv=v2&owner_uid=1130000023692780&size=2048x2048)
+
+Внимание!!! В поле ссылка указывается системное название типов контента! 
 
 Системное имя меню (строго): mobile_menu
 
