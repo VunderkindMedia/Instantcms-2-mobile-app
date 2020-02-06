@@ -84,7 +84,7 @@ API_KEY - Ваш ключ соответственно.
 
 # Собранное приложение APK настроенное на демо-сайт:
 
-https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40droidfun/VunderkindMedia_InstantCMS_2_MobileApp-d91a31579bdd469aa01da2aa48cf8c0d-signed.apk
+https://expo.io/artifacts/07e4cd76-6a1a-41b0-a8c4-295aec8fe052
 
 # Запуск проект без скачивания с гитхаба и дальнейшего билда (для теста через Expo):
 
