@@ -59,7 +59,7 @@ export const AppState = ({ children }) => {
   //CONTENT
   const get_items_list = async (ctype, page, refresh = false) => {
     console.log(page);
-    console.log(refresh);
+    console.log("refresh", refresh);
     var url;
 
     if (page) {
@@ -75,9 +75,9 @@ export const AppState = ({ children }) => {
       url =
         BASE_URL + "/api/method/content.get." + ctype + "?api_key=" + API_KEY;
     }
-    if (!page && !refresh) {
-      showLoader();
-    }
+    // if (!page && !refresh) {
+    //   showLoader();
+    // }
 
     clearError();
     try {
@@ -135,11 +135,10 @@ export const AppState = ({ children }) => {
         }
       );
       const data = await response.json();
-      console.log("asdgsdgsdg" + data.response);
       dispatch({ type: GET_CONTENT_ITEM, item_res: data.response });
     } catch (e) {
       showError();
-      hideLoader();
+
       console.log(e);
     } finally {
       hideLoader();

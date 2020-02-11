@@ -14,6 +14,7 @@ import HTML from "react-native-render-html";
 import { SliderBox } from "react-native-image-slider-box";
 import { Ionicons } from "@expo/vector-icons";
 import { formattingDate } from "../../utils/utils";
+import { BASE_URL } from "../../config/consts";
 
 export const Item = ({ route, navigation }) => {
   const { get_item, loading, error, item_res, settings } = useContext(
@@ -21,7 +22,7 @@ export const Item = ({ route, navigation }) => {
   );
 
   navigation.setOptions({ title: route.params.title });
-  console.log(loading);
+  console.log("loading", loading);
   var fields = [];
   var images = [];
   var props = [];
@@ -34,19 +35,16 @@ export const Item = ({ route, navigation }) => {
     loadItem();
   }, []);
 
-  const Content = () => {
-    return (
-      <View
-        key={"content"}
-        style={[styles.content, { color: settings.options.main_color }]}
-      >
-        <HTML
-          html={item_res.item.content}
-          imagesMaxWidth={Dimensions.get("window").width}
-        />
-      </View>
-    );
-  };
+  // const Content = () => {
+  //   return (
+  //     <View
+  //       key={"content"}
+  //       style={[styles.content, { color: settings.options.main_color }]}
+  //     >
+
+  //     </View>
+  //   );
+  // };
 
   const Title = () => {
     return (
@@ -95,6 +93,7 @@ export const Item = ({ route, navigation }) => {
   };
 
   if (!loading) {
+    //Парсим фото в слайдер
     if (item_res.item.photo && item_res.item.photo.normal) {
       images = [...images, item_res.item.photo.normal];
       for (var uris in item_res.item.photos) {
@@ -103,29 +102,73 @@ export const Item = ({ route, navigation }) => {
     } else if (route.params.ctype === "posts" && item_res.item.picture) {
       images = [...images, item_res.item.picture.normal];
     }
-
+    //Парсим остальные поля
     for (var key in item_res.additionally.fields) {
+      //Парсим все, кроме данных полей - они выводятся статично
       if (
         key !== "photo" &&
         key !== "photos" &&
         key !== "user" &&
         key !== "date_pub" &&
-        key !== "content" &&
         key !== "title" &&
         key !== "picture"
       ) {
-        if (item_res.additionally.fields[key].is_in_item === "1") {
-          fields = [
-            ...fields,
-            <View key={key} style={styles.filedsRow}>
-              <Text key={key + "title"} style={styles.textFieldTitle}>
-                {item_res.additionally.fields[key].title + ": "}
-              </Text>
-              <Text key={key + "value"} style={styles.textFieldValue}>
-                {item_res.item[key]}
-              </Text>
-            </View>
-          ];
+        if (
+          item_res.additionally.fields[key].is_in_item === "1" &&
+          item_res.item[key] !== null
+        ) {
+          if (
+            item_res.additionally.fields[key].type === "html" ||
+            item_res.additionally.fields[key].type === "source"
+          ) {
+            fields = [
+              ...fields,
+              <View key={key} style={styles.filedsRow}>
+                {item_res.additionally.fields[key].options.label_in_item !==
+                  "none" && (
+                  <Text key={key + "title"} style={styles.textFieldTitle}>
+                    {item_res.additionally.fields[key].title + ": "}
+                  </Text>
+                )}
+                <View key={{ key }} style={{ flex: 1 }}>
+                  <HTML
+                    // ignoredTags={["span"]}
+                    renderers={{
+                      p: (children, htmlAttribs) => (
+                        <Text key={Math.random()} style={{ marginVertical: 5 }}>
+                          {htmlAttribs}
+                        </Text>
+                      )
+                    }}
+                    staticContentMaxWidth={Dimensions.get("window").width}
+                    imagesMaxWidth={Dimensions.get("window").width}
+                    tagsStyles={{ img: { marginBottom: 5, marginRight: 5 } }}
+                    html={item_res.item[key].replace(
+                      /<img([^>]*)\ssrc=(['"])(\/[^\2*([^\2\s<]+)\2/gi,
+                      "<img$1 src=$2" + BASE_URL + "$3$2"
+                    )}
+                    //
+                  />
+                </View>
+              </View>
+            ];
+          } else {
+            fields = [
+              ...fields,
+              <View key={key} style={styles.filedsRow}>
+                {item_res.additionally.fields[key].options.label_in_item !==
+                  "none" && (
+                  <Text key={key + "title"} style={styles.textFieldTitle}>
+                    {item_res.additionally.fields[key].title + ": "}
+                  </Text>
+                )}
+
+                <Text style={{ flex: 1 }}>
+                  {item_res.item[key].replace(/&quot;/g, '"')}
+                </Text>
+              </View>
+            ];
+          }
         }
       }
     }
@@ -143,7 +186,7 @@ export const Item = ({ route, navigation }) => {
           imageLoadingColor="#2196F3"
         />
         <Title />
-        <Content />
+
         {fields}
         <InfoBar />
       </ScrollView>

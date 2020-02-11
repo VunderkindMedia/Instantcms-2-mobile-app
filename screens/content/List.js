@@ -90,6 +90,7 @@ export const List = ({ navigation, route }) => {
       {error && <ErrorView handle={showLoader} />}
       {!loading && renderMain && (
         <FlatList
+          scrollsToTop={false}
           data={itemsList}
           refreshing={reaching}
           onRefresh={() => {
