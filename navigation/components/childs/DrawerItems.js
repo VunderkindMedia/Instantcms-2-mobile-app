@@ -1,6 +1,8 @@
 import { DrawerItem } from "@react-navigation/drawer";
 import React, { useState, useContext } from "react";
 import { AppContext } from "../../../context/app/AppContext";
+import { Ionicons } from "@expo/vector-icons";
+import { Platform } from "react-native";
 
 export function DrawerItems({
   state,
@@ -31,7 +33,22 @@ export function DrawerItems({
             ? title
             : route.name
         }
-        icon={drawerIcon}
+        icon={({ focused }) => (
+          <Ionicons
+            key={id}
+            style={{
+              color: focused ? "#fff" : settings.options.main_color,
+              fontSize: 18
+            }}
+            name={
+              drawerIcon
+                ? Platform.OS === "ios"
+                  ? "ios-" + drawerIcon
+                  : "md-" + drawerIcon
+                : null
+            }
+          />
+        )}
         focused={focused}
         style={[
           {

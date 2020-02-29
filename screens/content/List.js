@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -14,110 +14,111 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { useFocusEffect } from "@react-navigation/native";
 
-export const List = ({ navigation, route }) => {
+let page = 1;
+
+const List = ({ navigation, route }) => {
+  console.log("re-render");
   const {
-    reaching,
     settings,
     get_items_list,
     itemsList,
     error,
     showLoader,
-    loading,
-    lazy,
     paging,
-    ctype_title,
-    showRefreshLoader,
-    showLazyLoader
+    ctype_title
   } = useContext(AppContext);
 
-  var page = 1;
-
-  const [renderMain, setRenderMain] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [lazyLoad, setLazyLoad] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const isRefresh = () => {
     page = 1;
-    showRefreshLoader();
-    get_items_list(route.name, page, true);
+    setRefresh(true);
+    get_items_list(route.name, page, refresh).then(() => {
+      setRefresh(false);
+    });
   };
 
   const moreLoad = () => {
     page++;
-    showLazyLoader();
-    console.log("page", page);
-    get_items_list(route.name, page);
-  };
-
-  setTimeout(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <Ionicons
-          onPress={() => navigation.toggleDrawer()}
-          name="ios-menu"
-          size={24}
-          style={{ marginLeft: 10 }}
-          color={settings.options.main_color}
-        />
-      )
+    setLazyLoad(true);
+    get_items_list(route.params.ctype, page).then(() => {
+      setLazyLoad(false);
     });
-  }, 0);
+  };
 
   useFocusEffect(
     useCallback(() => {
-      setTimeout(() => {
-        setRenderMain(true);
-      }, 0);
-      get_items_list(route.params.ctype, page);
+      page = 1;
+      setLoading(true);
+      navigation.setOptions({
+        headerLeft: () => (
+          <Ionicons
+            onPress={() => navigation.toggleDrawer()}
+            name="ios-menu"
+            size={24}
+            style={{ marginLeft: 10 }}
+            color={settings.options.main_color}
+          />
+        )
+      });
+      get_items_list(route.params.ctype, page).then(() => {
+        setLoading(false);
+      });
     }, [])
   );
 
-  return (
-    <View style={styles.container}>
-      {loading && (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator />
-        </View>
-      )}
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
-      {!loading && itemsList.length === 0 && (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <Text>Нет ни одной записи</Text>
-        </View>
-      )}
-      {error && <ErrorView handle={showLoader} />}
-      {!loading && renderMain && (
-        <FlatList
-          scrollsToTop={false}
-          data={itemsList}
-          refreshing={reaching}
-          onRefresh={() => {
-            isRefresh();
-          }}
-          onEndReached={() => {
-            if (paging.has_next && !lazy) {
-              moreLoad();
-            }
-          }}
-          onEndReachedThreshold={0.5}
-          renderItem={item => (
-            <ItemRow
-              data={item}
-              ctype={route.name}
-              navigation={navigation}
-              title={ctype_title}
-            />
-          )}
-          initialNumToRender={2}
-          keyExtractor={(item, index) => String(index)}
-          ListFooterComponent={RenderFooter}
-        />
-      )}
-    </View>
-  );
+  if (!loading && itemsList.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Нет ни одной записи</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return <ErrorView handle={showLoader} />;
+  }
+
+  if (!loading) {
+    return (
+      <FlatList
+        scrollsToTop={false}
+        data={itemsList}
+        refreshing={refresh}
+        onRefresh={() => {
+          isRefresh();
+        }}
+        onEndReached={() => {
+          if (paging.has_next && !lazyLoad) {
+            moreLoad();
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        numColumns={1}
+        renderItem={item => (
+          <ItemRow
+            data={item}
+            ctype={route.name}
+            navigation={navigation}
+            title={ctype_title}
+          />
+        )}
+        initialNumToRender={0}
+        keyExtractor={(item, index) => String(index)}
+        ListFooterComponent={RenderFooter(lazyLoad)}
+      />
+    );
+  }
 };
-const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 5 }
-});
+
+export const MemoList = React.memo(List);

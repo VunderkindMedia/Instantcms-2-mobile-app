@@ -2,10 +2,8 @@ import React, { useContext } from "react";
 import { AppContext } from "../../../context/app/AppContext";
 import { View, ActivityIndicator } from "react-native";
 
-export const RenderFooter = () => {
-  const { lazy } = useContext(AppContext);
-
-  if (!lazy) {
+export const RenderFooter = lazyLoad => {
+  if (!lazyLoad) {
     return null;
   } else {
     return (

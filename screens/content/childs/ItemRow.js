@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import HTML from "react-native-render-html";
 import { Ionicons } from "@expo/vector-icons";
+import { CommonActions } from "@react-navigation/native";
 import { formattingDate } from "../../../utils/utils";
 import JsxParser from "react-jsx-parser";
 
@@ -21,6 +22,7 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
   const goToItem = () => {
     //console.log(data.item.title);
     showLoader();
+
     navigation.navigate(ctype + "Item", {
       title: title,
       item_id: data.item.id,
@@ -274,6 +276,7 @@ const styles = StyleSheet.create({
   Card: {
     borderRadius: 4,
     flex: 1,
+
     marginTop: 4,
     marginBottom: 4,
     marginLeft: 8,
@@ -309,6 +312,7 @@ const styles = StyleSheet.create({
 
     fontWeight: "bold"
   },
+
   TextView: {
     opacity: 0.8,
 

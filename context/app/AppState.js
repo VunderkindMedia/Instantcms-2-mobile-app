@@ -57,9 +57,7 @@ export const AppState = ({ children }) => {
   };
 
   //CONTENT
-  const get_items_list = async (ctype, page, refresh = false) => {
-    console.log(page);
-    console.log("refresh", refresh);
+  const get_items_list = async (ctype, page) => {
     var url;
 
     if (page) {
@@ -108,11 +106,6 @@ export const AppState = ({ children }) => {
     } catch (e) {
       showError();
       console.log(e);
-    } finally {
-      refresh = false;
-      hideRefreshLoader();
-      hideLazyLoader();
-      hideLoader();
     }
   };
 

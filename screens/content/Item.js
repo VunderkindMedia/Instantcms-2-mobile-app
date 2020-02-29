@@ -17,21 +17,22 @@ import { formattingDate } from "../../utils/utils";
 import { BASE_URL } from "../../config/consts";
 
 export const Item = ({ route, navigation }) => {
-  const { get_item, loading, error, item_res, settings } = useContext(
-    AppContext
-  );
+  const { get_item, error, item_res, settings } = useContext(AppContext);
+  const [loading, setLoading] = useState(true);
 
-  navigation.setOptions({ title: route.params.title });
-  console.log("loading", loading);
   var fields = [];
   var images = [];
   var props = [];
 
-  const loadItem = useCallback(async () => {
-    await get_item(route.params.ctype, route.params.item_id);
-  }, []);
+  const loadItem = () => {
+    get_item(route.params.ctype, route.params.item_id).then(() => {
+      setLoading(false);
+    });
+  };
 
   useEffect(() => {
+    navigation.setOptions({ title: route.params.title });
+    console.log("loading", loading);
     loadItem();
   }, []);
 

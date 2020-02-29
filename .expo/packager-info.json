@@ -2,9 +2,9 @@
   "devToolsPort": 19002,
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 55213,
-  "expoServerNgrokUrl": "https://k5-8yx.droidfun.instantcms-2-mobile-app.exp.direct",
-  "packagerNgrokUrl": "https://packager.k5-8yx.droidfun.instantcms-2-mobile-app.exp.direct",
-  "ngrokPid": 55247,
+  "packagerPid": 18002,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
   "webpackServerPort": 19006
 }

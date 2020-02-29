@@ -7,7 +7,7 @@ import AppNav from "./navigation/AppNavigator";
 import { ErrorView } from "./screens/content/ErrorView";
 
 export const MainScreen = () => {
-  const { get_icms2_settings, loading, error } = useContext(AppContext);
+  const { get_icms2_settings, error } = useContext(AppContext);
   const loadOptions = useCallback(async () => await get_icms2_settings(), []);
   const [ready, setReady] = useState(false);
   const onErrorHandle = () => {
