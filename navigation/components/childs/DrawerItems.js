@@ -15,7 +15,7 @@ export function DrawerItems({
   itemStyle,
   labelStyle,
   activeLabelStyle,
-  inactiveLabelStyle
+  inactiveLabelStyle,
 }) {
   const { settings, showLoader } = useContext(AppContext);
   return state.routes.map((route, i) => {
@@ -35,10 +35,10 @@ export function DrawerItems({
         }
         icon={({ focused }) => (
           <Ionicons
-            key={id}
+            key={drawerIcon}
             style={{
               color: focused ? "#fff" : settings.options.main_color,
-              fontSize: 18
+              fontSize: 18,
             }}
             name={
               drawerIcon
@@ -54,17 +54,15 @@ export function DrawerItems({
           {
             backgroundColor: focused
               ? settings.options.main_color
-              : inactiveBackgroundColor
+              : inactiveBackgroundColor,
           },
-          itemStyle
+          itemStyle,
         ]}
         labelStyle={[
           labelStyle,
-          focused ? { color: "#fff" } : { color: settings.options.main_color }
+          focused ? { color: "#fff" } : { color: settings.options.main_color },
         ]}
         onPress={() => {
-          showLoader();
-
           !focused ? navigation.navigate(route.name) : navigation.closeDrawer();
         }}
       />

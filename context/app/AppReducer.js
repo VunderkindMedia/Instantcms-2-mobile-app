@@ -1,31 +1,25 @@
 import {
   GET_ICMS2_SETTINGS,
-  SHOW_LOADER,
-  SHOW_ERROR,
-  CLEAR_ERROR,
-  HIDE_LOADER,
   GET_CONTENT_ITEMS,
   GET_CONTENT_ITEM,
-  CLEAR_CONTENT_ITEMS,
-  CLEAR_CONTENT_ITEM,
   GET_MORE_CONTENT_ITEMS,
-  SHOW_REFRESH_LOADER,
-  HIDE_REFRESH_LOADER,
-  SHOW_LAZY_LOADER,
-  HIDE_LAZY_LOADER
+  SIGN_IN_LOADER,
+  LOGOUT_LOADER,
+  LOGIN_ERROR,
+  IS_AUTH
 } from "./types";
 
 export const initialState = {
   settings: {},
   itemsList: [],
-  reaching: false,
   additionally: {},
   ctype_title: "",
   paging: {},
   item_res: {},
-  lazy: false,
-  loading: true,
-  error: null
+  sign_in_loading: false,
+  logout_loading: false,
+  login_error: null,
+  isAuth: false
 };
 
 export default function AppReducer(state, action) {
@@ -38,7 +32,7 @@ export default function AppReducer(state, action) {
         itemsList: action.itemsList,
         additionally: { ...action.additionally },
         ctype_title: action.ctype_title,
-        paging: { ...action.paging }
+        paging: { ...action.paging },
       };
     case GET_MORE_CONTENT_ITEMS:
       return {
@@ -46,30 +40,18 @@ export default function AppReducer(state, action) {
         itemsList: [...state.itemsList, ...action.itemsList],
         additionally: { ...action.additionally },
         ctype_title: action.ctype_title,
-        paging: { ...action.paging }
+        paging: { ...action.paging },
       };
-    case CLEAR_CONTENT_ITEMS:
-      return { ...state, itemsList: {} };
-    case CLEAR_CONTENT_ITEM:
-      return { ...state, item: {} };
     case GET_CONTENT_ITEM:
       return { ...state, item_res: action.item_res };
-    case SHOW_LOADER:
-      return { ...state, loading: true };
-    case HIDE_LOADER:
-      return { ...state, loading: false };
-    case SHOW_ERROR:
-      return { ...state, error: true };
-    case CLEAR_ERROR:
-      return { ...state, error: false };
-    case SHOW_REFRESH_LOADER:
-      return { ...state, reaching: true };
-    case HIDE_REFRESH_LOADER:
-      return { ...state, reaching: false };
-    case SHOW_LAZY_LOADER:
-      return { ...state, lazy: true };
-    case HIDE_LAZY_LOADER:
-      return { ...state, lazy: false };
+    case SIGN_IN_LOADER:
+      return { ...state, sign_in_loading: action.sign_in_loading };
+    case LOGOUT_LOADER:
+      return { ...state, logout_loading: action.logout_loading };
+    case LOGIN_ERROR:
+      return { ...state, login_error: action.login_error };
+    case IS_AUTH:
+      return { ...state, isAuth: action.isAuth };
     default:
       return state;
   }

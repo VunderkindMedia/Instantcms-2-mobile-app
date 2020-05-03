@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
-import { Text, View, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 
@@ -8,7 +7,7 @@ import { AppState } from "./context/app/AppState";
 import { MainScreen } from "./MainScreen";
 
 export default function App() {
-  [isReady, setReady] = useState(false);
+  const [isReady, setReady] = useState(false);
 
   if (!isReady) {
     return (

@@ -1,35 +1,38 @@
-import React, { useContext, useCallback, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "./context/app/AppContext";
-import { AppLoading } from "expo";
-import { View, Text, ActivityIndicator } from "react-native";
-import { List } from "./screens/content/List";
-import AppNav from "./navigation/AppNavigator";
+
+import { View, ActivityIndicator } from "react-native";
+
+import { AppNav } from "./navigation/AppNavigator";
 import { ErrorView } from "./screens/content/ErrorView";
 
 export const MainScreen = () => {
-  const { get_icms2_settings, error } = useContext(AppContext);
-  const loadOptions = useCallback(async () => await get_icms2_settings(), []);
+  const { get_icms2_settings, isAuth } = useContext(AppContext);
+  const [error, setError] = useState(false);
   const [ready, setReady] = useState(false);
   const onErrorHandle = () => {
-    setReady(false);
-    console.log(ready);
-    console.log("Error " + error);
+    setError(false);
   };
 
-  if (!ready) {
+  useEffect(() => {
+    get_icms2_settings()
+      .then((result) => {
+        console.log(result);
+        setReady(true);
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(true);
+      });
+  }, [error, isAuth]);
+
+  if (!ready && !error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
-        <AppLoading
-          startAsync={loadOptions}
-          onError={error => console.log(error)}
-          onFinish={() => {
-            setReady(true);
-          }}
-        />
       </View>
     );
-  } else if (error) {
+  } else if (!ready && error) {
     return <ErrorView handle={onErrorHandle} />;
   } else {
     return <AppNav />;

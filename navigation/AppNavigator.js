@@ -2,41 +2,81 @@ import React, { useContext } from "react";
 
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationNativeContainer } from "@react-navigation/native";
-import { MemoList } from "../screens/content/List";
+import { List } from "../screens/content/List";
 import { Item } from "../screens/content/Item";
 import { createStackNavigator } from "@react-navigation/stack";
+
 import { AppContext } from "../context/app/AppContext";
 import DrawerContent from "./components/DrawerContent";
 import { Settings } from "../screens/content/Settings";
+import { Categories } from "../screens/content/Categories";
+import { Filter } from "../screens/content/Filter";
 import { SignIn } from "../screens/Auth/SighIn";
+import { SignUp } from "../screens/Auth/SignUp.js";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-export function ContentStack({ navigation, route }) {
+function ContentStack({ navigation, route }) {
   const { settings } = useContext(AppContext);
+  const forFade = ({ current }) => ({
+    cardStyle: {
+      opacity: current.progress,
+    },
+  });
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTintColor: settings.options.main_color
+        headerTintColor: settings.options.main_color,
       }}
     >
       <Stack.Screen
-        name={route.name}
-        component={MemoList}
-        initialParams={{ ctype: route.params.ctype }}
-        options={{ title: route.params.title }}
+        name={"List"}
+        component={List}
+        initialParams={{ ctype: route.params.url }}
+        options={{
+          title: route.params.title,
+          cardStyleInterpolator: forFade,
+        }}
       />
-      <Stack.Screen name={route.name + "Item"} component={Item} />
+      <Stack.Screen
+        name={"Item"}
+        component={Item}
+        options={{
+          title: route.params.title,
+          cardStyleInterpolator: forFade,
+        }}
+      />
+      <Stack.Screen
+        name={"Categories"}
+        component={Categories}
+        mode="modal"
+        options={{
+          cardStyleInterpolator: forFade,
+        }}
+      />
+      <Stack.Screen
+        name={"Filter"}
+        component={Filter}
+        mode="modal"
+        options={{
+          cardStyleInterpolator: forFade,
+        }}
+      />
     </Stack.Navigator>
   );
 }
 
 export function SettingsStack({ route }) {
+  const { settings } = useContext(AppContext);
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerTintColor: settings.options.main_color,
+      }}
+    >
       <Stack.Screen
-        name={route.name}
+        name={"Settings"}
         component={Settings}
         options={{ title: "Настройки" }}
       />
@@ -45,12 +85,22 @@ export function SettingsStack({ route }) {
 }
 
 export function AuthStack({ route }) {
+  const { settings } = useContext(AppContext);
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerTintColor: settings.options.main_color,
+      }}
+    >
       <Stack.Screen
-        name={route.name}
+        name={"SignIn"}
         component={SignIn}
         options={{ title: "Авторизация" }}
+      />
+      <Stack.Screen
+        name={"SignUp"}
+        component={SignUp}
+        options={{ title: "Регистрация" }}
       />
     </Stack.Navigator>
   );
@@ -60,71 +110,71 @@ function DrawerMenu() {
   const { settings } = useContext(AppContext);
   var initial_menu = [];
 
-  for (id in settings.menu) {
-    if (
-      settings.menu[id].url.split("*")[0] === "auth" &&
-      settings.menu[id].is_enabled === "1"
-    ) {
-      initial_menu = [
+  for (var id in settings.menu) {
+    if (settings.menu[id].is_enabled === "1") {
+
+      initial_menu.push(
         <Drawer.Screen
           key={id}
-          name={settings.menu[id].url.split("*")[0]}
-          component={AuthStack}
-          initialParams={{ title: "Авторизация" }}
+          name={settings.menu[id].url}
+          component={ContentStack}
           options={{
             drawerLabel: settings.menu[id].title,
-            drawerIcon: settings.menu[id].options.class
+            drawerIcon: settings.menu[id].options.class,
           }}
-        />,
-        ...initial_menu
-      ];
-    } else {
-      if (settings.menu[id].is_enabled === "1") {
-        initial_menu = [
-          ...initial_menu,
-          <Drawer.Screen
-            key={id}
-            name={settings.menu[id].url.split("*")[0]}
-            component={ContentStack}
-            options={{
-              drawerLabel: settings.menu[id].title,
-              drawerIcon: settings.menu[id].options.class
-            }}
-            initialParams={{
-              ctype: settings.menu[id].url.split("*")[0],
-              title: settings.menu[id].title
-            }}
-          />
-        ];
-      }
+          initialParams={{
+            url: settings.menu[id].url,
+            title: settings.menu[id].title,
+          }}
+        />
+      );
+
     }
   }
 
   return (
     <Drawer.Navigator
       drawerStyle={{
-        width: 240
+        width: 240,
       }}
-      // unmountInactiveScreens={true}
+      unmountInactiveScreens={true}
       initialRouteName={settings.options.start_page}
-      drawerContent={props => <DrawerContent {...props} />}
+      drawerContent={(props) => <DrawerContent {...props} />}
     >
+      {
+        !settings.user_info.date_log &&
+        <Drawer.Screen
+          key={"first"}
+          name={"auth"}
+          component={AuthStack}
+          initialParams={{
+            title: "Авторизация",
+          }}
+          options={{
+            drawerLabel: "Авторизация",
+            drawerIcon: "person",
+          }}
+        />
+
+      }
       {initial_menu}
       <Drawer.Screen
         key="last"
         name="settings"
         component={SettingsStack}
-        initialParams={{ title: "Настройки" }}
+        initialParams={{
+          title: "Настройки",
+        }}
         options={{
           drawerLabel: "Настройки",
-          drawerIcon: "build"
+          drawerIcon: "build",
         }}
       />
     </Drawer.Navigator>
   );
 }
 
-export default AppNav = () => {
+export const AppNav = () => {
   return (
     <NavigationNativeContainer>
       <DrawerMenu />

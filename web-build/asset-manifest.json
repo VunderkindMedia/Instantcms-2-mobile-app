@@ -1,0 +1,18 @@
+{
+  "app.js": "/static/js/bundle.js",
+  "app.01e8d354d6bdbaebbc28.map": "/01e8d354d6bdbaebbc28.map",
+  "fonts/AntDesign.ttf": "/./fonts/AntDesign.ttf",
+  "fonts/Entypo.ttf": "/./fonts/Entypo.ttf",
+  "fonts/Feather.ttf": "/./fonts/Feather.ttf",
+  "fonts/FontAwesome.ttf": "/./fonts/FontAwesome.ttf",
+  "fonts/FontAwesome5_Brands.ttf": "/./fonts/FontAwesome5_Brands.ttf",
+  "fonts/FontAwesome5_Solid.ttf": "/./fonts/FontAwesome5_Solid.ttf",
+  "fonts/Foundation.ttf": "/./fonts/Foundation.ttf",
+  "fonts/Ionicons.ttf": "/./fonts/Ionicons.ttf",
+  "fonts/MaterialCommunityIcons.ttf": "/./fonts/MaterialCommunityIcons.ttf",
+  "fonts/MaterialIcons.ttf": "/./fonts/MaterialIcons.ttf",
+  "fonts/Sans_Serif.ttf": "/./fonts/Sans_Serif.ttf",
+  "fonts/SimpleLineIcons.ttf": "/./fonts/SimpleLineIcons.ttf",
+  "index.html": "/index.html",
+  "manifest.json": "/manifest.json"
+}

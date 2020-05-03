@@ -2,12 +2,13 @@ import React, { useEffect, useContext, useCallback, useState } from "react";
 import {
   ScrollView,
   View,
+  Platform,
   Text,
   ActivityIndicator,
   Image,
   ImageBackground,
   StyleSheet,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { AppContext } from "../../context/app/AppContext";
 import HTML from "react-native-render-html";
@@ -35,17 +36,6 @@ export const Item = ({ route, navigation }) => {
     console.log("loading", loading);
     loadItem();
   }, []);
-
-  // const Content = () => {
-  //   return (
-  //     <View
-  //       key={"content"}
-  //       style={[styles.content, { color: settings.options.main_color }]}
-  //     >
-
-  //     </View>
-  //   );
-  // };
 
   const Title = () => {
     return (
@@ -139,7 +129,7 @@ export const Item = ({ route, navigation }) => {
                         <Text key={Math.random()} style={{ marginVertical: 5 }}>
                           {htmlAttribs}
                         </Text>
-                      )
+                      ),
                     }}
                     staticContentMaxWidth={Dimensions.get("window").width}
                     imagesMaxWidth={Dimensions.get("window").width}
@@ -151,7 +141,7 @@ export const Item = ({ route, navigation }) => {
                     //
                   />
                 </View>
-              </View>
+              </View>,
             ];
           } else {
             fields = [
@@ -167,7 +157,7 @@ export const Item = ({ route, navigation }) => {
                 <Text style={{ flex: 1 }}>
                   {item_res.item[key].replace(/&quot;/g, '"')}
                 </Text>
-              </View>
+              </View>,
             ];
           }
         }
@@ -206,33 +196,33 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 10,
     marginBottom: 10,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   DataIcons: {
-    fontSize: 14
+    fontSize: 14,
   },
   DataText: {
     fontSize: 12,
 
     marginRight: 15,
-    marginLeft: 5
+    marginLeft: 5,
   },
   filedsRow: {},
   mainContainer: {},
   content: {
     marginHorizontal: 5,
-    marginVertical: 10
+    marginVertical: 10,
   },
   title: {
     fontSize: 16,
     marginVertical: 10,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   filedsRow: {
     marginHorizontal: 10,
     marginVertical: 5,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   textFieldTitle: {},
-  textFieldValue: { flex: 1 }
+  textFieldValue: { flex: 1 },
 });

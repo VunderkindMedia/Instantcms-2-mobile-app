@@ -1,31 +1,52 @@
 import React, { useContext } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppContext } from "../../../context/app/AppContext";
 
 export const Header = () => {
-  const { settings } = useContext(AppContext);
+  const { settings, logout, setAuth, isAuth } = useContext(AppContext);
   return (
     <View style={styles.container}>
-      <Ionicons
-        size={30}
-        name="ios-cog"
-        style={[styles.icons, { color: settings.options.main_color }]}
-      />
       <View style={styles.userContainer}>
+        {settings.user_info.date_log && (
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons
+              size={30}
+              name="ios-cog"
+              style={[styles.icons, { color: settings.options.main_color }]}
+            />
+          </TouchableOpacity>
+        )}
+
         <Image
-          source={{
-            uri: "http://f0386604.xsph.ru/upload/default/avatar_micro.png"
-          }}
+          source={
+            settings.user_info.avatar
+              ? { uri: settings.user_info.avatar }
+              : require("../../../assets/avatar_placeholder.png")
+          }
           style={[styles.avatar, { borderColor: settings.options.main_color }]}
         />
-        <Text>Вася пупкин</Text>
+        {settings.user_info.date_log && (
+          <TouchableOpacity
+            onPress={() =>
+              logout().then((result) => {
+                setAuth(!isAuth);
+              })
+            }
+          >
+            <Ionicons
+              size={30}
+              name="ios-log-out"
+              style={[styles.icons, { color: settings.options.main_color }]}
+            />
+          </TouchableOpacity>
+        )}
       </View>
-      <Ionicons
-        size={30}
-        name="ios-log-out"
-        style={[styles.icons, { color: settings.options.main_color }]}
-      />
+      <View style={styles.nickname_container}>
+        <Text style={[styles.nickname, { color: settings.options.main_color }]}>
+          {settings.user_info.nickname ? settings.user_info.nickname : "Гость"}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -36,16 +57,24 @@ const styles = StyleSheet.create({
     width: 60,
     borderRadius: 60 / 2,
     borderWidth: 2,
-    borderColor: "orange"
+    borderColor: "orange",
   },
   container: {
     marginTop: 20,
-    justifyContent: "space-evenly",
-    flexDirection: "row",
-    alignItems: "center"
+    flexDirection: "column",
   },
   userContainer: {
-    alignItems: "center"
+    alignItems: "center",
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "space-evenly",
   },
-  icons: {}
+  nickname: {
+    fontWeight: "bold",
+  },
+
+  nickname_container: {
+    marginVertical: 10,
+    alignItems: "center",
+  },
 });

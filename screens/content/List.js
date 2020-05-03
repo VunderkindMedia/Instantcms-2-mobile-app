@@ -1,95 +1,143 @@
-import React, { useState, useContext, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import {
   View,
   Text,
   ActivityIndicator,
-  StyleSheet,
-  FlatList
+  TouchableOpacity,
+  FlatList,
+  InteractionManager,
 } from "react-native";
 import { AppContext } from "../../context/app/AppContext";
 import { RenderFooter } from "./childs/RenderFooter";
 import { ItemRow } from "./childs/ItemRow";
 import { ErrorView } from "./ErrorView";
 import { Ionicons } from "@expo/vector-icons";
+import { CLEAR_ERROR } from "../../context/app/types";
+import { Toggler } from "../../navigation/components/childs/Toggler"
 
-import { useFocusEffect } from "@react-navigation/native";
-
+// import { useFocusEffect } from "@react-navigation/native";
 let page = 1;
-
-const List = ({ navigation, route }) => {
+export const List = ({ navigation, route }) => {
   console.log("re-render");
   const {
     settings,
     get_items_list,
     itemsList,
-    error,
-    showLoader,
     paging,
-    ctype_title
+    ctype_title,
+    additionally,
   } = useContext(AppContext);
 
-  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   const [lazyLoad, setLazyLoad] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [error, setError] = useState(false);
+
+  const onErrorHandle = () => {
+    setError(false);
+  };
 
   const isRefresh = () => {
     page = 1;
     setRefresh(true);
-    get_items_list(route.name, page, refresh).then(() => {
-      setRefresh(false);
-    });
+    get_items_list(route.params.ctype, page, refresh)
+      .then(() => {
+        setRefresh(false);
+      })
+      .catch((error) => {
+        console.log("List Refresh Error: ", error);
+        setRefresh(false);
+        setError(true);
+      });
   };
 
   const moreLoad = () => {
     page++;
     setLazyLoad(true);
-    get_items_list(route.params.ctype, page).then(() => {
-      setLazyLoad(false);
-    });
+    get_items_list(route.params.ctype, page)
+      .then((result) => {
+        console.log("Lazyresult", result);
+        console.log(page);
+        setLazyLoad(false);
+      })
+      .catch((error) => {
+        console.log("List More Load Error: ", error);
+        setLazyLoad(false);
+        setError(true);
+      });
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      page = 1;
-      setLoading(true);
-      navigation.setOptions({
-        headerLeft: () => (
-          <Ionicons
-            onPress={() => navigation.toggleDrawer()}
-            name="ios-menu"
-            size={24}
-            style={{ marginLeft: 10 }}
-            color={settings.options.main_color}
-          />
-        )
-      });
-      get_items_list(route.params.ctype, page).then(() => {
-        setLoading(false);
-      });
-    }, [])
-  );
+  Toggler(navigation);
 
-  if (loading) {
+  useEffect(() => {
+    page = 1;
+
+    get_items_list(route.params.ctype, page)
+      .then(() => {
+        setReady(true);
+      })
+      .catch((error) => {
+        console.log("List Error: ", error);
+
+        setError(true);
+      });
+  }, [error]);
+
+  if (!ready && !error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
       </View>
     );
-  }
-
-  if (!loading && itemsList.length === 0) {
+  } else if (ready && !error && itemsList.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Нет ни одной записи</Text>
       </View>
     );
-  }
+  } else if (error) {
+    return <ErrorView handle={onErrorHandle} />;
+  } else if (ready && !error && itemsList.length > 0) {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row" }}>
+          {additionally.ctype.is_cats === "1" ? (
+            <Ionicons
+              onPress={() => {
+                navigation.navigate("Categories", {
+                  ctype: route.params.ctype,
+                });
+              }}
+              name="ios-folder-open"
+              size={24}
+              style={{ marginRight: 10 }}
+              color={settings.options.main_color}
+            />
+          ) : null}
 
-  if (error) {
-    return <ErrorView handle={showLoader} />;
-  }
+          {additionally.ctype.options.list_show_filter === 1 ? (
+            <Ionicons
+              onPress={() => {
+                navigation.navigate("Filter", {
+                  ctype: route.params.ctype,
+                });
+              }}
+              name="ios-funnel"
+              size={24}
+              style={{ marginRight: 10 }}
+              color={settings.options.main_color}
+            />
+          ) : null}
+        </View>
+      ),
+    });
 
-  if (!loading) {
     return (
       <FlatList
         scrollsToTop={false}
@@ -105,10 +153,10 @@ const List = ({ navigation, route }) => {
         }}
         onEndReachedThreshold={0.5}
         numColumns={1}
-        renderItem={item => (
+        renderItem={(item) => (
           <ItemRow
             data={item}
-            ctype={route.name}
+            ctype={route.params.ctype}
             navigation={navigation}
             title={ctype_title}
           />
@@ -120,5 +168,3 @@ const List = ({ navigation, route }) => {
     );
   }
 };
-
-export const MemoList = React.memo(List);
