@@ -19,7 +19,7 @@ import { ItemRow } from "./childs/ItemRow";
 import { ErrorView } from "./ErrorView";
 import { Ionicons } from "@expo/vector-icons";
 import { CLEAR_ERROR } from "../../context/app/types";
-import { Toggler } from "../../navigation/components/childs/Toggler"
+import { Toggler } from "../../navigation/components/childs/Toggler";
 
 // import { useFocusEffect } from "@react-navigation/native";
 let page = 1;
@@ -32,6 +32,7 @@ export const List = ({ navigation, route }) => {
     paging,
     ctype_title,
     additionally,
+    theme,
   } = useContext(AppContext);
 
   const [ready, setReady] = useState(false);
@@ -141,6 +142,13 @@ export const List = ({ navigation, route }) => {
     return (
       <FlatList
         scrollsToTop={false}
+        style={{
+          marginVertical: 5,
+          backgroundColor:
+            theme === "dark"
+              ? settings.options.dark_mode_color3
+              : settings.options.light_mode_color3,
+        }}
         data={itemsList}
         refreshing={refresh}
         onRefresh={() => {
@@ -152,7 +160,7 @@ export const List = ({ navigation, route }) => {
           }
         }}
         onEndReachedThreshold={0.5}
-        numColumns={1}
+        numColumns={settings.options["grid_list_columns_" + route.params.ctype]}
         renderItem={(item) => (
           <ItemRow
             data={item}

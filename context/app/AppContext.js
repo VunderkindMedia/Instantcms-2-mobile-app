@@ -1,3 +1,3 @@
-import { createContext } from "react";
+import { createContext, useEffect } from "react";
 
 export const AppContext = createContext();

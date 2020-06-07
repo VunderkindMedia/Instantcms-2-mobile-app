@@ -1,0 +1,13 @@
+export const SIGN_IN = "SIGN_IN";
+export const EMAIL_IS_VALID = "EMAIL_IS_VALID";
+export const PASSWORD_IS_VALID = "PASSWORD_IS_VALID";
+export const SET_EMAIL = "SET_EMAIL";
+export const SET_PASSWORD = "SET_PASSWORD";
+export const SIG = "SIG";
+export const CSRF_TOKEN = "CSRF_TOKEN";
+export const SIGN_FIELDS = "SIGN_FIELDS";
+export const SIGN_IN_ERROR = "SIGN_IN_ERROR";
+export const SIGN_IN_LOADER = "SIGN_IN_LOADER";
+export const SIGN_UP_LOADER = "SIGN_UP_LOADER";
+export const SIGN_UP_GET_FIELDS_LOADING = "SIGN_UP_GET_FIELDS_LOADING";
+export const SET_SIGN_UP_REQUEST_DATA = "SET_SIGN_UP_REQUEST_DATA";

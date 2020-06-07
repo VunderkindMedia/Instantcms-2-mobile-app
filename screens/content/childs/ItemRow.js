@@ -11,18 +11,21 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  TouchableNativeFeedback,
+  TouchableHighlight,
 } from "react-native";
+import { SliderBox } from "react-native-image-slider-box";
 import HTML from "react-native-render-html";
 import { Ionicons } from "@expo/vector-icons";
-import { CommonActions } from "@react-navigation/native";
 import { formattingDate } from "../../../utils/utils";
 import JsxParser from "react-jsx-parser";
 
 export const ItemRow = ({ data, ctype, navigation, title }) => {
-  const { settings, showLoader } = useContext(AppContext);
-  const goToItem = () => {
-    //console.log(data.item.title);
+  const { settings, theme } = useContext(AppContext);
+  const TouchableView =
+    Platform.OS === "ios" ? TouchableHighlight : TouchableNativeFeedback;
 
+  const goToItem = () => {
     navigation.push("Item", {
       title: title,
       item_id: data.item.id,
@@ -32,27 +35,40 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
 
   if (settings.options["template_list_" + ctype] === "big_image") {
     return (
-      <TouchableOpacity onPress={() => goToItem()}>
-        <View style={styles.Card}>
+      <TouchableView onPress={() => goToItem()}>
+        <View style={settings.options.styles.cardBigImage}>
           <ImageBackground
             imageStyle={{ borderRadius: 4 }}
             source={{
               uri:
-                data.item.photo && data.item.photo.normal
-                  ? data.item.photo.normal
+                data.item.photo &&
+                data.item.photo[settings.options["images_preset_list_" + ctype]]
+                  ? data.item.photo[
+                      settings.options["images_preset_list_" + ctype]
+                    ]
                   : "https://www.exclusivehomedesign.it/wp-content/uploads/2018/07/noPhoto.png",
               cache: "force-cache",
             }}
             onLoad={() => {}}
             onLoadStart={() => {}}
             onLoadEnd={() => {}}
-            style={styles.Image}
+            style={settings.options.styles.imageBigImage}
           >
-            <View style={styles.HeaderView}>
-              <View style={styles.CatView}>
+            <View style={settings.options.styles.headerViewBigImage}>
+              <View
+                style={[
+                  settings.options.styles.catViewBigImage,
+                  {
+                    backgroundColor:
+                      theme === "dark"
+                        ? settings.options.dark_mode_color2
+                        : settings.options.light_mode_color2,
+                  },
+                ]}
+              >
                 <Text
                   style={[
-                    styles.CatText,
+                    settings.options.styles.catTextBigImage,
                     { color: settings.options.main_color },
                   ]}
                 >
@@ -60,115 +76,142 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
                 </Text>
               </View>
             </View>
-            <View style={styles.BottomView}>
-              <View style={styles.TextView}>
+
+            <View
+              style={[
+                settings.options.styles.bottomViewBigImage,
+                {
+                  backgroundColor:
+                    theme === "dark"
+                      ? settings.options.dark_mode_color2
+                      : settings.options.light_mode_color2,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  settings.options.styles.textTitleBigImage,
+                  { color: settings.options.main_color },
+                ]}
+                numberOfLines={2}
+              >
+                {data.item.title}
+              </Text>
+              <View style={settings.options.styles.infoBarView}>
+                <Ionicons
+                  style={[
+                    settings.options.styles.infoBarIcons,
+                    { color: settings.options.main_color },
+                  ]}
+                  name={Platform.OS === "ios" ? "ios-calendar" : "md-calendar"}
+                />
                 <Text
-                  style={[styles.Text, { color: settings.options.main_color }]}
+                  style={[
+                    settings.options.styles.infoBarLabelsBigPhoto,
+                    { color: settings.options.main_color },
+                  ]}
                 >
-                  {data.item.title}
+                  {formattingDate(data.item.date_pub)}
                 </Text>
-                <View style={styles.DataView}>
-                  <Ionicons
-                    style={[
-                      styles.DataIcons,
-                      { color: settings.options.main_color },
-                    ]}
-                    name={
-                      Platform.OS === "ios" ? "ios-calendar" : "md-calendar"
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.DataText,
-                      { color: settings.options.main_color },
-                    ]}
-                  >
-                    {formattingDate(data.item.date_pub)}
-                  </Text>
-                  <Ionicons
-                    style={[
-                      styles.DataIcons,
-                      { color: settings.options.main_color },
-                    ]}
-                    name={Platform.OS === "ios" ? "ios-eye" : "md-eye"}
-                  />
-                  <Text
-                    style={[
-                      styles.DataText,
-                      { color: settings.options.main_color },
-                    ]}
-                  >
-                    {data.item.hits_count}
-                  </Text>
-                  <Ionicons
-                    style={[
-                      styles.DataIcons,
-                      { color: settings.options.main_color },
-                    ]}
-                    name={Platform.OS === "ios" ? "ios-text" : "md-text"}
-                  />
-                  <Text
-                    style={[
-                      styles.DataText,
-                      { color: settings.options.main_color },
-                    ]}
-                  >
-                    {data.item.comments}
-                  </Text>
-                  <Ionicons
-                    style={[
-                      styles.DataIcons,
-                      { color: settings.options.main_color },
-                    ]}
-                    name={Platform.OS === "ios" ? "ios-heart" : "md-heart"}
-                  />
-                  <Text
-                    style={[
-                      styles.DataText,
-                      { color: settings.options.main_color },
-                    ]}
-                  >
-                    {data.item.rating}
-                  </Text>
-                </View>
+                <Ionicons
+                  style={[
+                    settings.options.styles.infoBarIcons,
+                    { color: settings.options.main_color },
+                  ]}
+                  name={Platform.OS === "ios" ? "ios-eye" : "md-eye"}
+                />
+                <Text
+                  style={[
+                    settings.options.styles.infoBarLabelsBigPhoto,
+                    { color: settings.options.main_color },
+                  ]}
+                >
+                  {data.item.hits_count}
+                </Text>
+                <Ionicons
+                  style={[
+                    settings.options.styles.infoBarIcons,
+                    { color: settings.options.main_color },
+                  ]}
+                  name={Platform.OS === "ios" ? "ios-text" : "md-text"}
+                />
+                <Text
+                  style={[
+                    settings.options.styles.infoBarLabelsBigPhoto,
+                    { color: settings.options.main_color },
+                  ]}
+                >
+                  {data.item.comments}
+                </Text>
+                <Ionicons
+                  style={[
+                    settings.options.styles.infoBarIcons,
+                    { color: settings.options.main_color },
+                  ]}
+                  name={Platform.OS === "ios" ? "ios-heart" : "md-heart"}
+                />
+                <Text
+                  style={[
+                    settings.options.styles.infoBarLabelsBigPhoto,
+                    { color: settings.options.main_color },
+                  ]}
+                >
+                  {data.item.rating}
+                </Text>
               </View>
             </View>
           </ImageBackground>
         </View>
-      </TouchableOpacity>
+      </TouchableView>
     );
   } else if (settings.options["template_list_" + ctype] === "left_image") {
     return (
-      <TouchableOpacity onPress={() => goToItem()}>
-        <View style={styles.CardLeftPhoto}>
-          <View style={styles.LeftPhotoMainView}>
+      <TouchableView onPress={() => goToItem()}>
+        <View style={settings.options.styles.cardLeftPhoto}>
+          <View style={settings.options.styles.mainViewLeftPhoto}>
             <Image
               imageStyle={{ borderRadius: 4 }}
               source={{
                 uri: data.item.photo
-                  ? data.item.photo.small
+                  ? data.item.photo.normal
                   : data.item.picture
                   ? data.item.picture.normal
                   : "https://www.exclusivehomedesign.it/wp-content/uploads/2018/07/noPhoto.png",
               }}
-              style={styles.ImageLeft}
+              style={settings.options.styles.imageLeftPhoto}
             />
-            <View style={styles.LeftColumnView}>
+            <View
+              style={[
+                settings.options.styles.rightViewLeftpPhoto,
+                {
+                  backgroundColor:
+                    theme === "dark"
+                      ? settings.options.dark_mode_color2
+                      : settings.options.light_mode_color2,
+                },
+              ]}
+            >
               <Text
                 style={[
-                  styles.TextLeftPhoto,
+                  settings.options.styles.titleLeftPhoto,
                   { color: settings.options.main_color },
                 ]}
+                numberOfLines={2}
               >
                 {data.item.title}
               </Text>
-              <View style={styles.DataView}>
+              <View style={settings.options.styles.infoBarView}>
                 <View style={{ flexDirection: "column" }}>
                   <View style={{ flexDirection: "row" }}>
                     <Ionicons
                       style={[
-                        styles.DataIcons,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarIcons,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                       name={
                         Platform.OS === "ios" ? "ios-calendar" : "md-calendar"
@@ -176,8 +219,13 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
                     />
                     <Text
                       style={[
-                        styles.DataLeftPhotoText,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarLabelsLeftPhoto,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                     >
                       {formattingDate(data.item.date_pub)}
@@ -186,45 +234,75 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
                   <View style={{ flexDirection: "row" }}>
                     <Ionicons
                       style={[
-                        styles.DataIcons,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarIcons,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                       name={Platform.OS === "ios" ? "ios-eye" : "md-eye"}
                     />
                     <Text
                       style={[
-                        styles.DataLeftPhotoText,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarLabelsLeftPhoto,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                     >
                       {data.item.hits_count}
                     </Text>
                     <Ionicons
                       style={[
-                        styles.DataIcons,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarIcons,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                       name={Platform.OS === "ios" ? "ios-text" : "md-text"}
                     />
                     <Text
                       style={[
-                        styles.DataLeftPhotoText,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarLabelsLeftPhoto,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                     >
                       {data.item.comments}
                     </Text>
                     <Ionicons
                       style={[
-                        styles.DataIcons,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarIcons,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                       name={Platform.OS === "ios" ? "ios-heart" : "md-heart"}
                     />
                     <Text
                       style={[
-                        styles.DataLeftPhotoText,
-                        { color: settings.options.main_color },
+                        settings.options.styles.infoBarLabelsLeftPhoto,
+                        {
+                          color:
+                            theme === "dark"
+                              ? settings.options.dark_mode_color1
+                              : settings.options.light_mode_color1,
+                        },
                       ]}
                     >
                       {data.item.rating}
@@ -235,7 +313,7 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
             </View>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableView>
     );
   } else if (settings.options["template_list_" + ctype] === "custom_template") {
     return (
@@ -248,6 +326,7 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
             ? data.item.teaser.replace(/<[^>]+>/g, "")
             : null,
           myHandler: () => goToItem(),
+          dark: true,
         }}
         blacklistedAttrs={null}
         componentsOnly={false}
@@ -262,9 +341,13 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
           Ionicons,
           Card,
           Image,
+          TouchableView,
           TouchableOpacity,
+          TouchableNativeFeedback,
           ImageBackground,
+
           HTML,
+          SliderBox,
         }}
         jsx={settings.options["template_custom_list_" + ctype]}
       />
@@ -272,108 +355,4 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
   }
 };
 
-const styles = StyleSheet.create({
-  Card: {
-    borderRadius: 4,
-    flex: 1,
-
-    marginTop: 4,
-    marginBottom: 4,
-    marginLeft: 8,
-    marginRight: 8,
-  },
-  CardLeftPhoto: {
-    borderRadius: 6,
-    marginTop: 2,
-    marginBottom: 2,
-    marginLeft: 4,
-    marginRight: 4,
-    flex: 1,
-  },
-  HeaderView: {
-    flex: 1,
-
-    alignItems: "flex-end",
-  },
-  BottomView: {
-    flex: 2,
-    marginRight: 50,
-    justifyContent: "flex-end",
-  },
-  Image: {
-    width: null,
-    borderRadius: 4,
-    height: 250,
-    justifyContent: "flex-end",
-    flex: 1,
-  },
-  Text: {
-    margin: 10,
-
-    fontWeight: "bold",
-  },
-
-  TextView: {
-    opacity: 0.9,
-
-    borderTopRightRadius: 3,
-    borderBottomRightRadius: 3,
-    backgroundColor: "#fff",
-    marginBottom: 20,
-  },
-  CatView: {
-    opacity: 0.9,
-    justifyContent: "flex-end",
-    width: 170,
-    marginTop: 20,
-    padding: 3,
-    alignItems: "center",
-    borderTopLeftRadius: 3,
-    borderBottomLeftRadius: 3,
-
-    backgroundColor: "#fff",
-  },
-  DataView: {
-    marginTop: 10,
-    marginLeft: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-  },
-  DataIcons: {
-    fontSize: 14,
-  },
-  DataText: {
-    fontSize: 12,
-
-    marginRight: 15,
-    marginLeft: 5,
-  },
-  DataLeftPhotoText: {
-    fontSize: 12,
-
-    marginRight: 15,
-    marginLeft: 7,
-  },
-  CatText: {
-    fontWeight: "bold",
-  },
-  ImageLeft: {
-    width: 100,
-    height: 100,
-    borderTopLeftRadius: 6,
-    borderBottomLeftRadius: 6,
-  },
-  LeftPhotoMainView: {
-    flexDirection: "row",
-  },
-  LeftColumnView: {
-    flexDirection: "column",
-    flex: 1,
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-  },
-  TextLeftPhoto: {
-    margin: 7,
-    fontSize: 14,
-  },
-});
+const styles = StyleSheet.create({});

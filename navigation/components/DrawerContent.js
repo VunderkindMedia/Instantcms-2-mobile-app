@@ -4,11 +4,14 @@ import { Header } from "./childs/Header";
 
 import { DrawerItems } from "./childs/DrawerItems";
 import React from "react";
+import { AuthState } from "../../context/auth/AuthState";
 
 export default function DrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
-      <Header />
+      <AuthState>
+        <Header />
+      </AuthState>
       <DrawerItems {...props} />
     </DrawerContentScrollView>
   );

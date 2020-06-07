@@ -1,10 +1,19 @@
 import React, { useContext } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppContext } from "../../../context/app/AppContext";
+import { AuthContext } from "../../../context/auth/AuthContext";
 
 export const Header = () => {
-  const { settings, logout, setAuth, isAuth } = useContext(AppContext);
+  const { settings, reload } = useContext(AppContext);
+  const { signOut } = useContext(AuthContext);
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
@@ -29,9 +38,27 @@ export const Header = () => {
         {settings.user_info.date_log && (
           <TouchableOpacity
             onPress={() =>
-              logout().then((result) => {
-                setAuth(!isAuth);
-              })
+              Alert.alert(
+                "Выход",
+                "Вы действительно хотите уйти?",
+                [
+                  {
+                    text: "Отменить",
+                    onPress: () => {
+                      return null;
+                    },
+                  },
+                  {
+                    text: "Подтвердить",
+                    onPress: () => {
+                      signOut().then((result) => {
+                        reload();
+                      });
+                    },
+                  },
+                ],
+                { cancelable: false }
+              )
             }
           >
             <Ionicons

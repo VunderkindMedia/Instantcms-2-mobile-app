@@ -18,7 +18,7 @@ import { formattingDate } from "../../utils/utils";
 import { BASE_URL } from "../../config/consts";
 
 export const Item = ({ route, navigation }) => {
-  const { get_item, error, item_res, settings } = useContext(AppContext);
+  const { get_item, error, item_res, settings, theme } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
 
   var fields = [];
@@ -117,23 +117,43 @@ export const Item = ({ route, navigation }) => {
               <View key={key} style={styles.filedsRow}>
                 {item_res.additionally.fields[key].options.label_in_item !==
                   "none" && (
-                  <Text key={key + "title"} style={styles.textFieldTitle}>
+                  <Text
+                    key={key + "title"}
+                    style={[
+                      {
+                        color:
+                          theme === "dark"
+                            ? settings.options.dark_mode_color1
+                            : settings.options.light_mode_color1,
+                      },
+                      styles.textFieldTitle,
+                    ]}
+                  >
                     {item_res.additionally.fields[key].title + ": "}
                   </Text>
                 )}
                 <View key={{ key }} style={{ flex: 1 }}>
                   <HTML
                     // ignoredTags={["span"]}
-                    renderers={{
-                      p: (children, htmlAttribs) => (
-                        <Text key={Math.random()} style={{ marginVertical: 5 }}>
-                          {htmlAttribs}
-                        </Text>
-                      ),
+                    // renderers={{
+                    //   p: (children, htmlAttribs) => (
+                    //     <View key={Math.random()} style={{ marginVertical: 5 }}>
+                    //       {htmlAttribs}
+                    //     </View>
+                    //   ),
+                    // }}
+                    baseFontStyle={{
+                      color:
+                        theme === "dark"
+                          ? settings.options.dark_mode_color1
+                          : settings.options.light_mode_color1,
                     }}
                     staticContentMaxWidth={Dimensions.get("window").width}
                     imagesMaxWidth={Dimensions.get("window").width}
-                    tagsStyles={{ img: { marginBottom: 5, marginRight: 5 } }}
+                    tagsStyles={{
+                      img: { marginBottom: 5, marginRight: 5 },
+                      text: { fontSize: 24 },
+                    }}
                     html={item_res.item[key].replace(
                       /<img([^>]*)\ssrc=(['"])(\/[^\2*([^\2\s<]+)\2/gi,
                       "<img$1 src=$2" + BASE_URL + "$3$2"

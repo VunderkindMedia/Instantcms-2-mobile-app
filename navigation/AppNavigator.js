@@ -1,7 +1,11 @@
 import React, { useContext } from "react";
 
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { NavigationNativeContainer } from "@react-navigation/native";
+import {
+  NavigationNativeContainer,
+  DefaultTheme,
+  DarkTheme,
+} from "@react-navigation/native";
 import { List } from "../screens/content/List";
 import { Item } from "../screens/content/Item";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -13,6 +17,7 @@ import { Categories } from "../screens/content/Categories";
 import { Filter } from "../screens/content/Filter";
 import { SignIn } from "../screens/Auth/SighIn";
 import { SignUp } from "../screens/Auth/SignUp.js";
+import { AuthState } from "../context/auth/AuthState";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -112,7 +117,6 @@ function DrawerMenu() {
 
   for (var id in settings.menu) {
     if (settings.menu[id].is_enabled === "1") {
-
       initial_menu.push(
         <Drawer.Screen
           key={id}
@@ -128,7 +132,6 @@ function DrawerMenu() {
           }}
         />
       );
-
     }
   }
 
@@ -141,8 +144,7 @@ function DrawerMenu() {
       initialRouteName={settings.options.start_page}
       drawerContent={(props) => <DrawerContent {...props} />}
     >
-      {
-        !settings.user_info.date_log &&
+      {!settings.user_info.date_log && (
         <Drawer.Screen
           key={"first"}
           name={"auth"}
@@ -155,8 +157,7 @@ function DrawerMenu() {
             drawerIcon: "person",
           }}
         />
-
-      }
+      )}
       {initial_menu}
       <Drawer.Screen
         key="last"
@@ -174,9 +175,22 @@ function DrawerMenu() {
   );
 }
 
-export const AppNav = () => {
+export const AppNav = ({}) => {
+  const { theme } = useContext(AppContext);
+  const MyTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: "#000",
+      card: "#1F2430",
+      border: "#1F2430",
+      background: "#1F2430",
+    },
+  };
   return (
-    <NavigationNativeContainer>
+    <NavigationNativeContainer
+      theme={theme === "dark" ? MyTheme : DefaultTheme}
+    >
       <DrawerMenu />
     </NavigationNativeContainer>
   );

@@ -3,11 +3,11 @@ import {
   GET_CONTENT_ITEMS,
   GET_CONTENT_ITEM,
   GET_MORE_CONTENT_ITEMS,
-  SIGN_IN_LOADER,
-  LOGOUT_LOADER,
-  LOGIN_ERROR,
-  IS_AUTH
+  RELOAD,
+  THEME,
 } from "./types";
+
+import AsyncStorage from "@react-native-community/async-storage";
 
 export const initialState = {
   settings: {},
@@ -19,7 +19,8 @@ export const initialState = {
   sign_in_loading: false,
   logout_loading: false,
   login_error: null,
-  isAuth: false
+  isAuth: false,
+  theme: "light",
 };
 
 export default function AppReducer(state, action) {
@@ -44,14 +45,10 @@ export default function AppReducer(state, action) {
       };
     case GET_CONTENT_ITEM:
       return { ...state, item_res: action.item_res };
-    case SIGN_IN_LOADER:
-      return { ...state, sign_in_loading: action.sign_in_loading };
-    case LOGOUT_LOADER:
-      return { ...state, logout_loading: action.logout_loading };
-    case LOGIN_ERROR:
-      return { ...state, login_error: action.login_error };
-    case IS_AUTH:
-      return { ...state, isAuth: action.isAuth };
+    case RELOAD:
+      return { ...state, rel: !state.rel };
+    case THEME:
+      return { ...state, theme: action.theme };
     default:
       return state;
   }

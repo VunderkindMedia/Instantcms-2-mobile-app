@@ -1,3 +1,11 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "cSpell.words": [
+        "Город",
+        "Группа",
+        "Пароль",
+        "Укажите",
+        "живете",
+        "котором"
+    ]
 }

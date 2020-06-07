@@ -6,3 +6,5 @@ export const SIGN_IN = "SIGN_IN";
 export const LOGOUT = "LOGOUT";
 export const LOGIN_ERROR = "LOGIN_ERROR";
 export const IS_AUTH = "IS_AUTH";
+export const RELOAD = "RELOAD";
+export const THEME = "THEME";
