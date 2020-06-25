@@ -21,9 +21,10 @@ import { language } from "../../core/language";
 
 export const SignIn = () => {
   const navigation = useNavigation();
-
+  const { signIn } = useContext(AuthContext);
   const onSubmit = (data) => {
     console.log(data);
+    // signIn(data);
     // signIn(email, password).then((result) => {
     //   result && reload();
     // });
@@ -48,64 +49,80 @@ export const SignIn = () => {
     <View style={styles.signInMainContainer}>
       <VForm
         fields={{
-          list: {
-            type: "list",
-            title: "List",
-            rules: [["required"]],
-            items: {
-              "4": "Пользователи",
+          "2": {
+            title: "Анкета",
+            hint: null,
+            fields: {
+              email: {
+                title: "Эл. адрес",
+                type: "string",
+                name: "email",
+                rules: [["required"]],
+                options: {
+                  is_required: 1,
+                  is_digits: null,
+                  is_number: 0,
+                  is_alphanumeric: null,
+                  is_email: null,
+                  is_unique: null,
+                  is_url: null,
+                  disable_drafts: 0,
+                  is_date_range_process: "hide",
+                  label_in_list: "none",
+                  label_in_item: "left",
+                  wrap_type: "auto",
+                  wrap_width: "",
+                  profile_value: "",
+                  location_type: "cities",
+                  auto_detect: null,
+                  location_group: "",
+                  output_string: "",
+                  author_access: null,
+                  parrent_type: "city",
+                },
+                var_type: "string",
+                items: [],
+                hint: "Укажите эл. адрес",
+                units: null,
+                default: null,
+              },
+              password: {
+                title: "Пароль",
+                type: "string",
+                name: "password",
+                rules: [["required"]],
+                options: {
+                  is_required: 1,
+                  is_digits: null,
+                  is_number: 0,
+                  is_alphanumeric: null,
+                  is_email: null,
+                  is_unique: null,
+                  is_url: null,
+                  disable_drafts: 0,
+                  is_date_range_process: "hide",
+                  label_in_list: "none",
+                  label_in_item: "left",
+                  wrap_type: "auto",
+                  wrap_width: "",
+                  profile_value: "",
+                  date_title: "Дата рождения",
+                  show_y: 1,
+                  show_m: null,
+                  show_d: null,
+                  show_h: null,
+                  show_i: null,
+                  range: "YEAR",
+                  from_date: null,
+                  author_access: null,
+                },
+                var_type: "string",
+                items: null,
+                hint: null,
+                units: null,
+                default: null,
+              },
             },
-            name: "list",
-          },
-          string: {
-            type: "string",
-            title: "Textd",
-            rules: [["required"], ["min_length", 6], ["max_length", 72]],
-            name: "text",
-          },
-          city: {
-            title: "Город",
-            type: "city",
-            name: "city",
-            rules: [["required"]],
-            var_type: "integer",
-            items: [],
-            hint: "Укажите город, в котором вы живете",
-            units: null,
-            default: null,
-          },
-          telephon: {
-            title: "Телефон",
-            type: "telephone",
-            name: "telephon",
-            rules: [["required"]],
-            var_type: "string",
-            items: null,
-            hint: null,
-            units: null,
-            default: null,
-          },
-          birth_date: {
-            title: "Возраст",
-            type: "age",
-            name: "birth_date",
-            rules: [["required"], ["date"]],
-            var_type: "string",
-            items: null,
-            hint: null,
-            units: null,
-            default: null,
-          },
-          rules: {
-            title: "С правилами сайта согласен",
-            type: "rules",
-            name: "rules",
-            rules: [["required"]],
-            var_type: "integer",
-            items: null,
-            hint: null,
-            units: null,
-            default: null,
           },
         }}
         onSubmitForm={onSubmit}

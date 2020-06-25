@@ -42,62 +42,61 @@ export const AuthState = ({ children }) => {
     }
   };
 
-  const signIn = async () => {
-    if (validateEmail() && validatePassword()) {
-      try {
-        clearLoginError();
-        showSignInLoader();
-        const sig_response = await fetch(
-          BASE_URL + "/api/method/auth.signup_fields?api_key=" + API_KEY,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const sig_data = await sig_response.json();
+  const signIn = async (data) => {
+    let body = new FormData();
 
-        const response = await fetch(
-          BASE_URL +
-            "/api/method/auth.login?api_key=" +
-            API_KEY +
-            "&sig=" +
-            sig_data.response.sig +
-            "&email=" +
-            state.email +
-            "&password=" +
-            state.password +
-            "&remember=true",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log("EMAIL: " + state.email);
-        console.log("PASSWORD: " + state.password);
-        const data = await response.json();
-        if (data.error) {
-          setLoginError(data.error.error_msg);
-          return false;
-        } else if (data.response) {
-          return true;
+    Object.keys(data).forEach((key, value) => {
+      console.log(key, data[key]);
+      body.append(key, data[key]);
+    });
+    try {
+      clearLoginError();
+      showSignInLoader();
+      const sig_response = await fetch(
+        BASE_URL + "/api/method/auth.signup_fields?api_key=" + API_KEY,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         }
-      } catch (e) {
-        console.log("Ошибка: " + e);
-        setLoginError(e);
-        throw new Error(e);
-      } finally {
-        hideSignInLoader();
-        setEmail(null);
-        setPassword(null);
+      );
+      const sig_data = await sig_response.json();
+
+      const response = await fetch(
+        BASE_URL +
+          "/api/method/auth.login?api_key=" +
+          API_KEY +
+          "&sig=" +
+          sig_data.response.sig +
+          "&remember=true",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
+          },
+          body: body,
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+      if (data.error) {
+        setLoginError(data.error.error_msg);
+        return false;
+      } else if (data.response) {
+        return true;
       }
+    } catch (e) {
+      console.log("Ошибка: " + e);
+      setLoginError(e);
+      throw new Error(e);
+    } finally {
+      hideSignInLoader();
     }
   };
 
@@ -124,20 +123,20 @@ export const AuthState = ({ children }) => {
         csrf_token: fields_data.response.item.csrf_token.fields[0].default,
       });
 
-      let fields = {};
-      fields = { ...fields, ...fields_data.response.item.basic.fields };
+      // let fields = {};
+      // fields = { ...fields, ...fields_data.response.item.basic.fields };
 
-      Object.keys(fields_data.response.item).map(function (key, value) {
-        if (key !== "basic" && key !== "csrf_token") {
-          fields = { ...fields, ...fields_data.response.item[key].fields };
-        }
-      });
-
-      dispatch({ type: SIGN_FIELDS, sign_fields: fields });
+      // Object.keys(fields_data.response.item).map(function (key, value) {
+      //   if (key !== "basic" && key !== "csrf_token") {
+      //     fields = { ...fields, ...fields_data.response.item[key].fields };
+      //   }
+      // });
+      console.log(fields_data.response.item);
+      dispatch({ type: SIGN_FIELDS, sign_fields: fields_data.response.item });
 
       hideSignUpGetFieldsInLoader();
 
-      return fields;
+      return fields_data.response.item;
     } catch (e) {
       console.log(e);
     }

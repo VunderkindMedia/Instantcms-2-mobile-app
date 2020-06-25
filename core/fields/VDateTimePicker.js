@@ -1,8 +1,19 @@
 import React, { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
+
 import { View, Text, Platform, Modal } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { language } from "../language";
+import { format } from "../../utils/utils";
+
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
+export const CancelButton = () => {
+  return (
+    <TouchableOpacity onPress={() => {}}>
+      <Text>Cancel</Text>
+    </TouchableOpacity>
+  );
+};
 
 export const VDateTimePicker = ({
   style,
@@ -10,19 +21,29 @@ export const VDateTimePicker = ({
   display = "default",
   mode = "time",
   textStyle,
+  pickerContainerStyle,
+  cancelBtnTextColor,
+  confirmBtnTextColor,
+  pickerStyle,
+  maximumDate,
+  minimumDate,
   placeholder,
-  buttonStyle,
+  locale,
   onChangeValue,
+  backgroundCancelBtn,
 }) => {
   const [date, setDate] = useState(new Date());
 
   const [show, setShow] = useState(false);
 
-  const onChange = (event, selectedDate) => {
+  const onChange = (selectedDate) => {
     const currentDate = selectedDate || date;
+    onChangeValue(selectedDate);
     setShow(Platform.OS === "ios");
+
     setDate(selectedDate);
-    onChangeValue(date);
+
+    setShow(false);
   };
 
   function calcDate(date1, date2) {
@@ -47,45 +68,36 @@ export const VDateTimePicker = ({
   };
 
   return (
-    <TouchableOpacity onPress={() => setShow(true)}>
-      <View>
-        <View style={style}>
-          <Text style={textStyle}>
-            {placeholder + ": " + date.toLocaleDateString("ru-RU", options)}
-          </Text>
-        </View>
-
-        <Modal visible={show}>
-          <View style={{ flex: 1, width: "100%", justifyContent: "center" }}>
-            <DateTimePicker
-              maximumDate={new Date()}
-              testID="dateTimePicker"
-              value={date}
-              locale="ru-RU"
-              mode={mode}
-              is24Hour={is24Hour}
-              display={display}
-              style={{ height: "50%" }}
-              onChange={onChange}
-            />
-
-            <TouchableOpacity
-              onPress={() => setShow(false)}
-              style={{
-                alignItems: "center",
-              }}
-            >
-              <View style={buttonStyle}>
-                <Text>
-                  {mode === "date"
-                    ? language.field_date_picker_submit_title
-                    : language.field_time_picker_submit_title}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-      </View>
-    </TouchableOpacity>
+    <View style={style}>
+      <TouchableOpacity
+        style={{ height: "100%", width: "100%", justifyContent: "center" }}
+        onPress={() => setShow(true)}
+      >
+        <Text style={textStyle}>
+          {placeholder + ": " + date.toLocaleDateString("RU-ru", options)}
+        </Text>
+      </TouchableOpacity>
+      <DateTimePickerModal
+        is24Hour={is24Hour}
+        isVisible={show}
+        cancelTextIOS={language.btn_cancel}
+        confirmTextIOS={language.btn_accept}
+        headerTextIOS={language.date_picker_header}
+        pickerContainerStyleIOS={pickerContainerStyle}
+        locale={locale}
+        date={date}
+        mode={mode}
+        style={pickerStyle}
+        display={display}
+        maximumDate={maximumDate}
+        minimumDate={minimumDate}
+        isDarkModeEnabled={false}
+        onConfirm={(date) => onChange(date)}
+        onCancel={() => setShow(false)}
+        backgroundCancelBtn={backgroundCancelBtn}
+        cancelBtnTextColor={cancelBtnTextColor}
+        confirmBtnTextColor={confirmBtnTextColor}
+      />
+    </View>
   );
 };

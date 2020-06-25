@@ -15,6 +15,7 @@ import Feather from "react-native-vector-icons/Feather";
 
 export const VLocationSelector = ({
   textInputStyle,
+  textColor,
   placeholder,
   style,
   modalStyle,
@@ -198,7 +199,9 @@ export const VLocationSelector = ({
   return (
     <View style={textInputStyle}>
       <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-        <Text>{!data.city.value ? placeholder : data.city.title}</Text>
+        <Text style={{ color: textColor }}>
+          {!data.city.value ? placeholder : data.city.title}
+        </Text>
       </TouchableOpacity>
 
       <Modal animationType="slide" transparent={false} visible={modalVisible}>
@@ -224,9 +227,8 @@ export const VLocationSelector = ({
           <View
             style={{
               flex: 1,
-
               width: "80%",
-              justifyContent: "center",
+              // justifyContent: "center",
               alignItems: "center",
             }}
           >

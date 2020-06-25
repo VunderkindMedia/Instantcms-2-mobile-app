@@ -15,15 +15,14 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { SliderBox } from "react-native-image-slider-box";
-import HTML from "react-native-render-html";
+// import HTML from "react-native-render-html";
 import { Ionicons } from "@expo/vector-icons";
 import { formattingDate } from "../../../utils/utils";
 import JsxParser from "react-jsx-parser";
+import TouchableView from "../../../utils/utils";
 
 export const ItemRow = ({ data, ctype, navigation, title }) => {
   const { settings, theme } = useContext(AppContext);
-  const TouchableView =
-    Platform.OS === "ios" ? TouchableHighlight : TouchableNativeFeedback;
 
   const goToItem = () => {
     navigation.push("Item", {
@@ -79,6 +78,12 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
 
             <View
               style={[
+                data.item.vazhnoe !== "Нет" && {
+                  borderRightWidth: 10,
+                  // borderTopWidth: 1,
+                  // borderBottomWidth: 1,
+                  borderColor: "orange",
+                },
                 settings.options.styles.bottomViewBigImage,
                 {
                   backgroundColor:
@@ -346,7 +351,7 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
           TouchableNativeFeedback,
           ImageBackground,
 
-          HTML,
+          // HTML,
           SliderBox,
         }}
         jsx={settings.options["template_custom_list_" + ctype]}
@@ -354,5 +359,3 @@ export const ItemRow = ({ data, ctype, navigation, title }) => {
     );
   }
 };
-
-const styles = StyleSheet.create({});

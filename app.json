@@ -6,33 +6,40 @@
     "sdkVersion": "37.0.0",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
-    "version": "1.0.0",
+
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 30
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
+
       "supportsTablet": true,
       "bundleIdentifier": "com.vunderkind.media",
       "buildNumber": "1.0.0"
+
+
     },
     "android": {
       "package": "com.vunderkind.media",
       "versionCode": 1
+
     }
   }
 }

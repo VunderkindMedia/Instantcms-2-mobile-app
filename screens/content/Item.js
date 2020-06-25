@@ -1,29 +1,30 @@
-import React, { useEffect, useContext, useCallback, useState } from "react";
+import React, { useEffect, useContext, useState, useRef } from "react";
 import {
   ScrollView,
   View,
   Platform,
   Text,
   ActivityIndicator,
-  Image,
-  ImageBackground,
   StyleSheet,
   Dimensions,
 } from "react-native";
+import MapView from "react-native-maps";
 import { AppContext } from "../../context/app/AppContext";
-import HTML from "react-native-render-html";
+import YoutubePlayer from "react-native-youtube-iframe";
+import HTMLView from "react-native-htmlview";
 import { SliderBox } from "react-native-image-slider-box";
 import { Ionicons } from "@expo/vector-icons";
-import { formattingDate } from "../../utils/utils";
+import { formattingDate, YouTubeGetID, AddHttp } from "../../utils/utils";
 import { BASE_URL } from "../../config/consts";
+import { WebView } from "react-native-webview";
+import HTML from "react-native-render-html";
 
 export const Item = ({ route, navigation }) => {
-  const { get_item, error, item_res, settings, theme } = useContext(AppContext);
+  const { get_item, item_res, settings, theme } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
-
+  const playerRef = useRef(null);
   var fields = [];
   var images = [];
-  var props = [];
 
   const loadItem = () => {
     get_item(route.params.ctype, route.params.item_id).then(() => {
@@ -41,7 +42,10 @@ export const Item = ({ route, navigation }) => {
     return (
       <Text
         key={"title"}
-        style={[styles.title, { color: settings.options.main_color }]}
+        style={[
+          styles(theme, settings).title,
+          { color: settings.options.main_color },
+        ]}
       >
         {item_res.item.title}
       </Text>
@@ -50,38 +54,106 @@ export const Item = ({ route, navigation }) => {
 
   const InfoBar = () => {
     return (
-      <View key={"info"} style={styles.DataView}>
+      <View key={"info"} style={styles(theme, settings).DataView}>
         <Ionicons
-          style={[styles.DataIcons, { color: settings.options.main_color }]}
+          style={[
+            styles(theme, settings).DataIcons,
+            { color: settings.options.main_color },
+          ]}
           name={Platform.OS === "ios" ? "ios-calendar" : "md-calendar"}
         />
-        <Text style={[styles.DataText, { color: settings.options.main_color }]}>
+        <Text
+          style={[
+            styles(theme, settings).DataText,
+            { color: settings.options.main_color },
+          ]}
+        >
           {formattingDate(item_res.item.date_pub)}
         </Text>
         <Ionicons
-          style={[styles.DataIcons, { color: settings.options.main_color }]}
+          style={[
+            styles(theme, settings).DataIcons,
+            { color: settings.options.main_color },
+          ]}
           name={Platform.OS === "ios" ? "ios-eye" : "md-eye"}
         />
-        <Text style={[styles.DataText, { color: settings.options.main_color }]}>
+        <Text
+          style={[
+            styles(theme, settings).DataText,
+            { color: settings.options.main_color },
+          ]}
+        >
           {item_res.item.hits_count}
         </Text>
         <Ionicons
-          style={[styles.DataIcons, { color: settings.options.main_color }]}
+          style={[
+            styles(theme, settings).DataIcons,
+            { color: settings.options.main_color },
+          ]}
           name={Platform.OS === "ios" ? "ios-text" : "md-text"}
         />
-        <Text style={[styles.DataText, { color: settings.options.main_color }]}>
+        <Text
+          style={[
+            styles(theme, settings).DataText,
+            { color: settings.options.main_color },
+          ]}
+        >
           {item_res.item.comments}
         </Text>
         <Ionicons
-          style={[styles.DataIcons, { color: settings.options.main_color }]}
+          style={[
+            styles(theme, settings).DataIcons,
+            { color: settings.options.main_color },
+          ]}
           name={Platform.OS === "ios" ? "ios-heart" : "md-heart"}
         />
-        <Text style={[styles.DataText, { color: settings.options.main_color }]}>
+        <Text
+          style={[
+            styles(theme, settings).DataText,
+            { color: settings.options.main_color },
+          ]}
+        >
           {item_res.item.rating}
         </Text>
       </View>
     );
   };
+
+  function renderNode(node, defaultRenderer, index) {
+    if (node.name === "span") {
+      return null;
+    }
+
+    if (node.name === "iframe") {
+      if (String(node.attribs.src).indexOf("youtube") !== -1) {
+        node.attribs.src = String(node.attribs.src).replace(
+          "//www",
+          "https://www"
+        );
+
+        return (
+          <YoutubePlayer
+            key={node.attribs.src}
+            ref={playerRef}
+            height={Dimensions.get("screen").width / (16 / 9)}
+            width={"100%"}
+            videoId={YouTubeGetID(node.attribs.src)}
+            play={false}
+            onChangeState={(event) => console.log(event)}
+            onReady={() => console.log("ready")}
+            onError={(e) => console.log(e)}
+            onPlaybackQualityChange={(q) => console.log(q)}
+            volume={50}
+            playbackRate={1}
+            playerParams={{
+              cc_lang_pref: "us",
+              showClosedCaptions: true,
+            }}
+          />
+        );
+      }
+    }
+  }
 
   if (!loading) {
     //Парсим фото в слайдер
@@ -114,7 +186,7 @@ export const Item = ({ route, navigation }) => {
           ) {
             fields = [
               ...fields,
-              <View key={key} style={styles.filedsRow}>
+              <View key={key} style={styles(theme, settings).filedsRow}>
                 {item_res.additionally.fields[key].options.label_in_item !==
                   "none" && (
                   <Text
@@ -126,39 +198,44 @@ export const Item = ({ route, navigation }) => {
                             ? settings.options.dark_mode_color1
                             : settings.options.light_mode_color1,
                       },
-                      styles.textFieldTitle,
+                      styles(theme, settings).textFieldTitle,
                     ]}
                   >
                     {item_res.additionally.fields[key].title + ": "}
                   </Text>
                 )}
                 <View key={{ key }} style={{ flex: 1 }}>
+                  {/* <HTMLView
+                    value={item_res.item[key]
+                      .replace(
+                        /<img([^>]*)\ssrc=(['"])(\/[^\2*([^\2\s<]+)\2/gi,
+                        "<img$1 src=$2" + BASE_URL + "$3$2"
+                      )
+                      .replace(/\r?\n/g, "")}
+                    stylesheet={stylesHtml(theme, settings)}
+                    addLineBreaks={false}
+                    renderNode={renderNode}
+                  /> */}
+
                   <HTML
-                    // ignoredTags={["span"]}
-                    // renderers={{
-                    //   p: (children, htmlAttribs) => (
-                    //     <View key={Math.random()} style={{ marginVertical: 5 }}>
-                    //       {htmlAttribs}
-                    //     </View>
-                    //   ),
-                    // }}
-                    baseFontStyle={{
-                      color:
-                        theme === "dark"
-                          ? settings.options.dark_mode_color1
-                          : settings.options.light_mode_color1,
+                    html={item_res.item[key]
+                      .replace(
+                        /<img([^>]*)\ssrc=(['"])(\/[^\2*([^\2\s<]+)\2/gi,
+                        "<img$1 src=$2" + BASE_URL + "$3$2"
+                      )
+                      .replace(/\r?\n/g, "")}
+                    tagsStyles={stylesHtml(theme, settings)}
+                    imagesMaxWidth={Dimensions.get("screen").width}
+                    staticContentMaxWidth={Dimensions.get("screen").width}
+                    alterChildren={(node) => {
+                      if (node.name === "iframe" || node.name === "img") {
+                        delete node.attribs.width;
+                        delete node.attribs.height;
+                        node.attribs.src = AddHttp(node.attribs.src);
+                        console.log(node.attribs);
+                      }
+                      return node.children;
                     }}
-                    staticContentMaxWidth={Dimensions.get("window").width}
-                    imagesMaxWidth={Dimensions.get("window").width}
-                    tagsStyles={{
-                      img: { marginBottom: 5, marginRight: 5 },
-                      text: { fontSize: 24 },
-                    }}
-                    html={item_res.item[key].replace(
-                      /<img([^>]*)\ssrc=(['"])(\/[^\2*([^\2\s<]+)\2/gi,
-                      "<img$1 src=$2" + BASE_URL + "$3$2"
-                    )}
-                    //
                   />
                 </View>
               </View>,
@@ -166,15 +243,18 @@ export const Item = ({ route, navigation }) => {
           } else {
             fields = [
               ...fields,
-              <View key={key} style={styles.filedsRow}>
+              <View key={key} style={styles(theme, settings).filedsRow}>
                 {item_res.additionally.fields[key].options.label_in_item !==
                   "none" && (
-                  <Text key={key + "title"} style={styles.textFieldTitle}>
+                  <Text
+                    key={key + "title"}
+                    style={styles(theme, settings).textFieldTitle}
+                  >
                     {item_res.additionally.fields[key].title + ": "}
                   </Text>
                 )}
 
-                <Text style={{ flex: 1 }}>
+                <Text style={styles(theme, settings).txtFieldValue}>
                   {item_res.item[key].replace(/&quot;/g, '"')}
                 </Text>
               </View>,
@@ -184,7 +264,7 @@ export const Item = ({ route, navigation }) => {
       }
     }
 
-    for (var prop in item_res.additionally.fields) {
+    for (var {} in item_res.additionally.fields) {
     }
 
     return (
@@ -211,38 +291,77 @@ export const Item = ({ route, navigation }) => {
   }
 };
 
-const styles = StyleSheet.create({
-  DataView: {
-    marginTop: 10,
-    marginLeft: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-  },
-  DataIcons: {
-    fontSize: 14,
-  },
-  DataText: {
-    fontSize: 12,
+export const styles = (theme, settings) => {
+  return StyleSheet.create({
+    DataView: {
+      marginTop: 10,
+      marginLeft: 10,
+      marginBottom: 10,
+      flexDirection: "row",
+    },
+    DataIcons: {
+      fontSize: 14,
+    },
+    DataText: {
+      fontSize: 12,
 
-    marginRight: 15,
-    marginLeft: 5,
-  },
-  filedsRow: {},
-  mainContainer: {},
-  content: {
-    marginHorizontal: 5,
-    marginVertical: 10,
-  },
-  title: {
-    fontSize: 16,
-    marginVertical: 10,
-    marginHorizontal: 5,
-  },
-  filedsRow: {
-    marginHorizontal: 10,
-    marginVertical: 5,
-    flexDirection: "row",
-  },
-  textFieldTitle: {},
-  textFieldValue: { flex: 1 },
-});
+      marginRight: 15,
+      marginLeft: 5,
+    },
+
+    mainContainer: {},
+    content: {
+      marginVertical: 10,
+    },
+    title: {
+      fontSize: 16,
+      marginVertical: 10,
+      marginHorizontal: 5,
+    },
+    filedsRow: {
+      marginVertical: 5,
+      marginHorizontal: 10,
+      flexDirection: "row",
+    },
+    textFieldTitle: {
+      marginHorizontal: 5,
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+    },
+    txtFieldValue: {
+      flex: 1,
+
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+    },
+  });
+};
+
+export const stylesHtml = (theme, settings) => {
+  const style = StyleSheet.create({
+    a: {
+      color: settings.options.main_color,
+      fontStyle: "italic",
+    },
+    p: {
+      marginVertical: 5,
+
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+    },
+
+    img: {
+      margin: 0,
+      right: 10,
+      padding: 10,
+    },
+  });
+
+  return style;
+};

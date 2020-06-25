@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Image,
   Animated,
   Keyboard,
   Easing,
@@ -16,9 +15,8 @@ import {
 } from "react-native";
 import { AppContext } from "../../context/app/AppContext";
 import { VForm } from "../../core/formFields/VForm";
-
+import { language } from "../../core/language";
 import { AuthContext } from "../../context/auth/AuthContext";
-import { ScrollView } from "react-native-gesture-handler";
 
 export const SignUp = () => {
   const { settings } = useContext(AppContext);
@@ -59,26 +57,9 @@ export const SignUp = () => {
 
   useEffect(() => {
     getSignFields().then((data) => {
-      console.log(sign_fields);
+      console.log(data);
     });
   }, []);
-
-  let fields_components = [];
-  {
-    Object.keys(sign_fields).map(function (field) {
-      // if (sign_fields[field].type !== "rules") {
-      fields_components.push(
-        <FormField
-          key={sign_fields[field].name}
-          field={sign_fields[field]}
-          onChangeValue={(item, name) => {
-            setSignUpRequestData({ [name]: item });
-          }}
-        />
-      );
-      // }
-    });
-  }
 
   if (getFieldsLoading) {
     return (
@@ -89,13 +70,13 @@ export const SignUp = () => {
   } else {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView
+        {/* <SafeAreaView
           style={[
             styles.container,
             { backgroundColor: settings.options.main_color },
           ]}
-        >
-          <KeyboardAvoidingView
+        > */}
+        {/* <KeyboardAvoidingView
             style={{
               justifyContent: "center",
               alignItems: "center",
@@ -104,8 +85,8 @@ export const SignUp = () => {
             }}
             behavior={Platform.IOS ? "padding" : "height"}
             keyboardVerticalOffset={150}
-          >
-            <Animated.View
+          > */}
+        {/* <Animated.View
               style={[
                 styles.mainView,
                 {
@@ -117,14 +98,17 @@ export const SignUp = () => {
               <Animated.Image
                 style={[styles.regLogo, { transform: [{ rotate: rotate }] }]}
                 source={require("../../assets/reg_logo.png")}
-              ></Animated.Image>
+              ></Animated.Image> */}
 
-              <ScrollView style={{ width: "100%" }}>
-                {fields_components}
-              </ScrollView>
-            </Animated.View>
-          </KeyboardAvoidingView>
-          <TouchableOpacity
+        <VForm
+          fields={sign_fields}
+          submitButtonTitle={language.submit_button_title}
+          onSubmitForm={console.log}
+        />
+        {/* </Animated.View> */}
+        {/* </SafeAreaView> */}
+        {/* </KeyboardAvoidingView> */}
+        {/* <TouchableOpacity
             style={[
               styles.loginBtn,
               {
@@ -142,8 +126,8 @@ export const SignUp = () => {
             {signUpLoading && (
               <ActivityIndicator color="white" style={{ marginLeft: 10 }} />
             )}
-          </TouchableOpacity>
-        </SafeAreaView>
+          </TouchableOpacity> */}
+        {/* </SafeAreaView> */}
       </TouchableWithoutFeedback>
     );
   }

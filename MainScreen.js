@@ -15,31 +15,31 @@ export const MainScreen = () => {
     setError(false);
   };
 
-  useEffect(() => {
-    // returned function will be called on component unmount
+  // useEffect(() => {
+  //   // returned function will be called on component unmount
 
-    const token_reg = async () => {
-      const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-      if (status !== "granted") {
-        alert(
-          "Hey! You might want to enable notifications for my app, they are good."
-        );
-        await Notifications.getExpoPushTokenAsync();
-        token_reg().then((token) => {
-          console.log(token);
-        });
-      }
-    };
+  //   const token_reg = async () => {
+  //     const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+  //     if (status !== "granted") {
+  //       alert(
+  //         "Hey! You might want to enable notifications for my app, they are good."
+  //       );
+  //       await Notifications.getExpoPushTokenAsync();
+  //       token_reg().then((token) => {
+  //         console.log(token);
+  //       });
+  //     }
+  //   };
 
-    if (Platform.OS === "android") {
-      Notifications.createChannelAndroidAsync("default", {
-        name: "default",
-        sound: true,
-        priority: "max",
-        vibrate: [0, 250, 250, 250],
-      });
-    }
-  }, []);
+  //   if (Platform.OS === "android") {
+  //     Notifications.createChannelAndroidAsync("default", {
+  //       name: "default",
+  //       sound: true,
+  //       priority: "max",
+  //       vibrate: [0, 250, 250, 250],
+  //     });
+  //   }
+  // }, []);
 
   useEffect(() => {
     setReady(false);
@@ -65,12 +65,12 @@ export const MainScreen = () => {
     return (
       <View style={{ flex: 1 }}>
         <StatusBar
-          backgroundColor={
-            theme === "dark"
-              ? settings.options.dark_mode_color2
-              : settings.options.light_mode_color2
-          }
-          barStyle={theme === "dark" && "light-content"}
+          // backgroundColor={
+          //   theme === "dark"
+          //     ? settings.options.dark_mode_color2
+          //     : settings.options.light_mode_color2
+          // }
+          barStyle={theme === "dark" ? "light-content" : "dark-content"}
         />
         <AppNav />
       </View>

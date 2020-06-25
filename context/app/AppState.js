@@ -13,20 +13,38 @@ import {
 } from "./types";
 import { ThemeConsumer } from "react-native-elements";
 
+import { Appearance, useColorScheme } from "react-native-appearance";
+
 export const AppState = ({ children }) => {
+  const systemTheme = useColorScheme();
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
   const getLocalTheme = async () => {
-    const local_theme = await AsyncStorage.getItem("theme");
-    console.log(local_theme);
+    try {
+      AsyncStorage.getItem("theme").then((local_theme) => {
+        AsyncStorage.getItem("numOfSwitch").then((numOfSwitch) => {
+          if (local_theme !== null) {
+            if (numOfSwitch !== "3") {
+              setTheme(numOfSwitch, local_theme);
+            } else {
+              setTheme(numOfSwitch, systemTheme);
+            }
+          } else {
+            setTheme("1", "dark");
+          }
+          console.log("THEME LOCAL", local_theme);
+        });
+      });
+    } catch (e) {
+      console.log(e);
+    }
 
-    setTheme(local_theme);
     return;
   };
 
   useEffect(() => {
     getLocalTheme();
-  }, []);
+  }, [systemTheme]);
 
   const get_icms2_settings = async () => {
     try {
@@ -44,6 +62,36 @@ export const AppState = ({ children }) => {
       const data = await response.json();
 
       dispatch({ type: GET_ICMS2_SETTINGS, settings: data.response });
+    } catch (e) {
+      console.log("Ошибка: " + e);
+      throw new Error(e);
+    }
+  };
+
+  const upload_photo = async (photoUri) => {
+    let body = new FormData();
+    console.log(photoUri);
+
+    body.append("photo", { uri: photoUri, type: "image/jpg", name: photoUri });
+
+    try {
+      const response = await fetch(
+        BASE_URL +
+          "/api/method/images.upload?api_key=" +
+          API_KEY +
+          "&name=photo",
+        {
+          method: "POST",
+          credentials: "some-original",
+
+          body: body,
+        }
+      );
+      const data = await response.json();
+
+      return data.response;
+
+      console.log(data);
     } catch (e) {
       console.log("Ошибка: " + e);
       throw new Error(e);
@@ -121,11 +169,15 @@ export const AppState = ({ children }) => {
     dispatch({ type: RELOAD });
   };
 
-  const setTheme = async (theme) => {
+  const setTheme = async (numOfSwitch, theme) => {
     try {
       await AsyncStorage.setItem("theme", theme);
+      await AsyncStorage.setItem("numOfSwitch", numOfSwitch);
       console.log(state.theme);
-      dispatch({ type: THEME, theme: theme });
+      dispatch({
+        type: THEME,
+        theme: { value: theme, numOfSwitch: numOfSwitch },
+      });
     } catch (e) {
       console.log(e);
     }
@@ -144,9 +196,12 @@ export const AppState = ({ children }) => {
         ctype_title: state.ctype_title,
         item_res: state.item_res,
         rel: state.rel,
-        theme: state.theme,
+        theme: state.theme.value,
+        systemTheme: systemTheme,
+        numThemeSwitch: state.theme.numOfSwitch,
         setTheme,
         reload,
+        upload_photo,
       }}
     >
       {children}

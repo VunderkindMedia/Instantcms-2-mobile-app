@@ -2,22 +2,24 @@ import React, { useContext } from "react";
 
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import {
-  NavigationNativeContainer,
+  NavigationContainer,
   DefaultTheme,
   DarkTheme,
 } from "@react-navigation/native";
 import { List } from "../screens/content/List";
 import { Item } from "../screens/content/Item";
-import { createStackNavigator } from "@react-navigation/stack";
-
+import { createStackNavigator, TransitionSpecs } from "@react-navigation/stack";
+import { CardStyleInterpolators } from "@react-navigation/stack";
 import { AppContext } from "../context/app/AppContext";
 import DrawerContent from "./components/DrawerContent";
+import { Counters } from "../screens/counters/Counters";
+import { Counter } from "../screens/counters/Counter";
 import { Settings } from "../screens/content/Settings";
 import { Categories } from "../screens/content/Categories";
 import { Filter } from "../screens/content/Filter";
 import { SignIn } from "../screens/Auth/SighIn";
 import { SignUp } from "../screens/Auth/SignUp.js";
-import { AuthState } from "../context/auth/AuthState";
+import { Animated } from "react-native";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -29,6 +31,7 @@ function ContentStack({ navigation, route }) {
       opacity: current.progress,
     },
   });
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -49,7 +52,8 @@ function ContentStack({ navigation, route }) {
         component={Item}
         options={{
           title: route.params.title,
-          cardStyleInterpolator: forFade,
+
+          // cardStyleInterpolator: forFade,
         }}
       />
       <Stack.Screen
@@ -65,7 +69,13 @@ function ContentStack({ navigation, route }) {
         component={Filter}
         mode="modal"
         options={{
-          cardStyleInterpolator: forFade,
+          // cardStyleInterpolator: forFade,
+
+          cardStyle: { backgroundColor: "transparent" },
+          cardOverlayEnabled: true,
+          gestureResponseDistance: { vertical: 1000 },
+          gestureDirection: "vertical",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
         }}
       />
     </Stack.Navigator>
@@ -84,6 +94,28 @@ export function SettingsStack({ route }) {
         name={"Settings"}
         component={Settings}
         options={{ title: "Настройки" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+export function CountersStack({ route }) {
+  const { settings } = useContext(AppContext);
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerTintColor: settings.options.main_color,
+      }}
+    >
+      <Stack.Screen
+        name={"Counters"}
+        component={Counters}
+        options={{ title: "Показания счетчиков" }}
+      />
+      <Stack.Screen
+        name={"Counter"}
+        component={Counter}
+        options={{ title: "Показания счетчика" }}
       />
     </Stack.Navigator>
   );
@@ -125,6 +157,7 @@ function DrawerMenu() {
           options={{
             drawerLabel: settings.menu[id].title,
             drawerIcon: settings.menu[id].options.class,
+            unmountOnBlur: true,
           }}
           initialParams={{
             url: settings.menu[id].url,
@@ -140,7 +173,6 @@ function DrawerMenu() {
       drawerStyle={{
         width: 240,
       }}
-      unmountInactiveScreens={true}
       initialRouteName={settings.options.start_page}
       drawerContent={(props) => <DrawerContent {...props} />}
     >
@@ -159,6 +191,19 @@ function DrawerMenu() {
         />
       )}
       {initial_menu}
+      {/* <Drawer.Screen
+        key="countersStack"
+        name="CounterStack"
+        component={CountersStack}
+        initialParams={{
+          title: "Показания счетчиков",
+        }}
+        options={{
+          unmountOnBlur: true,
+          drawerLabel: "Показания счетчиков",
+          drawerIcon: "build",
+        }}
+      /> */}
       <Drawer.Screen
         key="last"
         name="settings"
@@ -167,6 +212,7 @@ function DrawerMenu() {
           title: "Настройки",
         }}
         options={{
+          unmountOnBlur: true,
           drawerLabel: "Настройки",
           drawerIcon: "build",
         }}
@@ -176,22 +222,31 @@ function DrawerMenu() {
 }
 
 export const AppNav = ({}) => {
-  const { theme } = useContext(AppContext);
-  const MyTheme = {
+  const { theme, settings } = useContext(AppContext);
+  const darkTheme = {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      primary: "#000",
-      card: "#1F2430",
-      border: "#1F2430",
-      background: "#1F2430",
+      primary: settings.options.dark_mode_color3,
+      card: settings.options.dark_mode_color2,
+      border: settings.options.dark_mode_color2,
+      background: settings.options.dark_mode_color2,
+    },
+  };
+
+  const defaultTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: settings.options.light_mode_color3,
+      card: settings.options.light_mode_color2,
+      border: settings.options.light_mode_color2,
+      background: settings.options.light_mode_color2,
     },
   };
   return (
-    <NavigationNativeContainer
-      theme={theme === "dark" ? MyTheme : DefaultTheme}
-    >
+    <NavigationContainer theme={theme === "dark" ? darkTheme : defaultTheme}>
       <DrawerMenu />
-    </NavigationNativeContainer>
+    </NavigationContainer>
   );
 };
