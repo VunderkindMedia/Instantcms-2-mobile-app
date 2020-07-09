@@ -12,14 +12,18 @@ import { BASE_URL, API_KEY } from "../../config/consts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import VDropDownPicker from "./VDropDownPicker";
 import Feather from "react-native-vector-icons/Feather";
+import { useForm, Controller, ErrorMessage } from "react-hook-form";
 
 export const VLocationSelector = ({
   textInputStyle,
+  onChangeValue,
   textColor,
   placeholder,
   style,
   modalStyle,
-  onChangeValue,
+  errorStyle,
+  errors,
+  name,
 }) => {
   const [data, setData] = useState({
     city: {
@@ -195,14 +199,25 @@ export const VLocationSelector = ({
     }
   }, [data]);
 
-  useEffect(() => {}, [data]);
   return (
-    <View style={textInputStyle}>
+    <View
+      style={[
+        textInputStyle,
+        ,
+        errors[name] && {
+          borderColor: "red",
+          borderLeftWidth: 5,
+        },
+      ]}
+    >
       <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
         <Text style={{ color: textColor }}>
           {!data.city.value ? placeholder : data.city.title}
         </Text>
       </TouchableOpacity>
+      <ErrorMessage errors={errors} name={name}>
+        {({ message }) => <Text style={errorStyle}>{message}</Text>}
+      </ErrorMessage>
 
       <Modal animationType="slide" transparent={false} visible={modalVisible}>
         <SafeAreaView style={[modalStyle, { flex: 1, alignItems: "center" }]}>
@@ -235,6 +250,8 @@ export const VLocationSelector = ({
             <VDropDownPicker
               items={coutriesList}
               style={style}
+              name={name}
+              errors={{}}
               labelStyle={{ color: "#003f5c" }}
               placeholder="Выбор страны"
               value={data.country.title}
@@ -258,6 +275,8 @@ export const VLocationSelector = ({
             <VDropDownPicker
               items={regionsList}
               style={style}
+              name={name}
+              errors={{}}
               labelStyle={{ color: "#003f5c" }}
               placeholder="Выбор региона"
               value={data.region.title}
@@ -281,6 +300,8 @@ export const VLocationSelector = ({
             <VDropDownPicker
               items={citiesList}
               style={style}
+              name={name}
+              errors={{}}
               labelStyle={{ color: "#003f5c" }}
               placeholder="Выбор города"
               value={data.city.title}

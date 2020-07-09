@@ -18,20 +18,22 @@ import { useNavigation } from "@react-navigation/native";
 import { AppContext } from "../../context/app/AppContext";
 import { VForm } from "../../core/formFields/VForm";
 import { language } from "../../core/language";
+import { set } from "react-native-reanimated";
 
 export const SignIn = () => {
   const navigation = useNavigation();
   const { signIn } = useContext(AuthContext);
+
+  const { settings, reload, theme } = useContext(AppContext);
+  const { error } = useContext(AuthContext);
+
   const onSubmit = (data) => {
     console.log(data);
     // signIn(data);
-    // signIn(email, password).then((result) => {
-    //   result && reload();
-    // });
+    signIn(data).then((result) => {
+      result && reload();
+    });
   };
-
-  const { settings, reload } = useContext(AppContext);
-  const { error } = useContext(AuthContext);
 
   Toggler(navigation);
 
@@ -46,8 +48,9 @@ export const SignIn = () => {
   }, [error]);
 
   return (
-    <View style={styles.signInMainContainer}>
+    <View style={styles(theme, settings).signInMainContainer}>
       <VForm
+        scrollable={false}
         fields={{
           "2": {
             title: "Анкета",
@@ -57,7 +60,7 @@ export const SignIn = () => {
                 title: "Эл. адрес",
                 type: "string",
                 name: "email",
-                rules: [["required"]],
+                rules: [["required"], ["email"]],
                 options: {
                   is_required: 1,
                   is_digits: null,
@@ -127,21 +130,80 @@ export const SignIn = () => {
         }}
         onSubmitForm={onSubmit}
         submitButtonTitle={language.submit_button_title}
-      />
-
-      <TouchableOpacity onPress={() => navigation.push("SignUp")}>
-        <Text style={styles.loginText}>{language.register_button_title}</Text>
-      </TouchableOpacity>
+      >
+        <Text style={styles(theme, settings).orTextStyle}>- или -</Text>
+        <TouchableOpacity
+          style={[
+            styles(theme, settings).regBtn,
+            { backgroundColor: settings.options.auth_reg_color },
+          ]}
+          onPress={() => navigation.push("SignUp")}
+        >
+          <Text style={styles(theme, settings).regBtnTextStyle}>
+            {language.register_button_title}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles(theme, settings).rememberBtn}
+          onPress={() => navigation.push("Remember")}
+        >
+          <Text style={styles(theme, settings).rememberTextStyle}>
+            {language.remember_button_title}
+          </Text>
+        </TouchableOpacity>
+      </VForm>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  signInMainContainer: {
-    flex: 1,
-  },
-  forgot: {
-    color: "white",
-    fontSize: 11,
-  },
-});
+const styles = (theme, settings) =>
+  StyleSheet.create({
+    signInMainContainer: {
+      flex: 1,
+    },
+    forgot: {
+      color: "white",
+      fontSize: 11,
+    },
+    regBtn: {
+      width: "80%",
+      height: 40,
+      borderRadius: 15,
+
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "center",
+      marginTop: 10,
+      marginBottom: 10,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowOpacity: 0.24,
+      shadowRadius: 2.27,
+
+      elevation: 10,
+    },
+    orTextStyle: {
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+    },
+    regBtnTextStyle: {
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color2
+          : settings.options.light_mode_color2,
+    },
+    rememberBtn: {
+      marginVertical: 25,
+    },
+    rememberTextStyle: {
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+    },
+  });

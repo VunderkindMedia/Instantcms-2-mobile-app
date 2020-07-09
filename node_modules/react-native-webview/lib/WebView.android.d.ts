@@ -20,6 +20,8 @@ declare class WebView extends React.Component<AndroidWebViewProps, State> {
     startUrl: string | null;
     state: State;
     webViewRef: React.RefObject<NativeWebViewAndroid>;
+    messagingModuleName: string;
+    componentDidMount: () => void;
     getCommands: () => {
         goForward: number;
         goBack: number;

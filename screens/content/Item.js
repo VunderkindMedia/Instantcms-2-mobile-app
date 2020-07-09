@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import MapView from "react-native-maps";
 import { AppContext } from "../../context/app/AppContext";
@@ -18,6 +19,7 @@ import { formattingDate, YouTubeGetID, AddHttp } from "../../utils/utils";
 import { BASE_URL } from "../../config/consts";
 import { WebView } from "react-native-webview";
 import HTML from "react-native-render-html";
+import { CommentIcon } from "../Comments/childs/CommentIcon";
 
 export const Item = ({ route, navigation }) => {
   const { get_item, item_res, settings, theme } = useContext(AppContext);
@@ -33,8 +35,6 @@ export const Item = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: route.params.title });
-    console.log("loading", loading);
     loadItem();
   }, []);
 
@@ -156,6 +156,18 @@ export const Item = ({ route, navigation }) => {
   }
 
   if (!loading) {
+    navigation.setOptions({
+      headerRight: () => (
+        <CommentIcon
+          route={route}
+          iconColor={settings.options.main_color}
+          navigation={navigation}
+          id={item_res.item.id}
+          subject={route.params.ctype}
+          controller={"content"}
+        />
+      ),
+    });
     //Парсим фото в слайдер
     if (item_res.item.photo && item_res.item.photo.normal) {
       images = [...images, item_res.item.photo.normal];

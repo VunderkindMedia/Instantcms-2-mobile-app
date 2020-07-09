@@ -5,11 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Switch,
-  KeyboardAvoidingView,
-  Button,
-  Dimensions,
-  Image,
+  ScrollView,
 } from "react-native";
 import Moment from "moment";
 import "moment/locale/ru";
@@ -17,16 +13,23 @@ import VDropDownPicker from "../fields/VDropDownPicker";
 import VImagePicker from "../fields/VImagePicker";
 import { AppContext } from "../../context/app/AppContext";
 import { AuthContext } from "../../context/auth/AuthContext";
-import { TextInput, ScrollView } from "react-native-gesture-handler";
-import { VLocationSelector } from "../fields/VLocationSelector";
 
+import { VLocationSelector } from "../fields/VLocationSelector";
+import { VTextInput } from "../fields/VTextInput";
 import { VSwitch } from "../fields/VSwitch";
 import { VPhone } from "../fields/VPhone";
 import { language } from "../language";
 import { VDateTimePicker } from "../fields/VDateTimePicker";
 
-export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
+export const VForm = ({
+  fields,
+  onSubmitForm,
+  submitButtonTitle,
+  scrollable,
+  children,
+}) => {
   const { settings, theme, systemTheme } = useContext(AppContext);
+
   const { loading } = useContext(AuthContext);
   const {
     register,
@@ -73,29 +76,14 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                 }
                 name={fields[key]["fields"][field].name}
                 items={list_values}
-                style={[
-                  styles(theme, settings).inputView,
-                  errors[fields[key]["fields"][field].name] && {
-                    borderColor: "red",
-                    borderLeftWidth: 5,
-                  },
-                ]}
+                errors={errors}
+                errorStyle={styles(theme, settings).errorMessage}
+                style={styles(theme, settings).inputView}
                 placeholder={fields[key]["fields"][field].title}
                 dropDownLabelStyle={{ fontSize: 16 }}
                 defaultNull
                 animation="fade"
               />
-
-              <ErrorMessage
-                errors={errors}
-                name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
             </View>
           );
         } else if (
@@ -107,50 +95,28 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               key={fields[key]["fields"][field].title}
               style={styles(theme, settings).fieldContainer}
             >
-              <View
-                style={[
-                  styles(theme, settings).inputView,
-                  errors[fields[key]["fields"][field].name] && {
-                    borderColor: "red",
-                    borderLeftWidth: 5,
-                  },
-                ]}
-              >
-                <Controller
-                  as={TextInput}
-                  control={control}
-                  onChangeText={(value) =>
-                    setValue(fields[key]["fields"][field].name, value)
-                  }
-                  value="dfsdf"
-                  keyboardType={
-                    fields[key]["fields"][field].type === "number"
-                      ? "numeric"
-                      : "default"
-                  }
-                  onChangeName="onChangeText"
-                  name={fields[key]["fields"][field].name}
-                  style={styles(theme, settings).inputText}
-                  placeholderTextColor={
-                    theme === "dark"
-                      ? settings.options.dark_mode_color5
-                      : settings.options.light_mode_color5
-                  }
-                  placeholder={fields[key]["fields"][field].title}
-                  dropDownLabelStyle={{ fontSize: 16 }}
-                  defaultValue=""
-                />
-              </View>
-              <ErrorMessage
+              <VTextInput
                 errors={errors}
+                textStyle={styles(theme, settings).inputText}
+                onChangeText={(value) =>
+                  setValue(fields[key]["fields"][field].name, value, true)
+                }
+                value="dfsdf"
+                keyboardType={
+                  fields[key]["fields"][field].type === "number"
+                    ? "numeric"
+                    : "default"
+                }
                 name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
+                style={styles(theme, settings).inputView}
+                placeholderTextColor={
+                  theme === "dark"
+                    ? settings.options.dark_mode_color5
+                    : settings.options.light_mode_color5
+                }
+                errorStyle={styles(theme, settings).errorMessage}
+                placeholder={fields[key]["fields"][field].title}
+              />
             </View>
           );
         } else if (fields[key]["fields"][field].type === "city") {
@@ -159,59 +125,23 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               key={fields[key]["fields"][field].title}
               style={styles(theme, settings).fieldContainer}
             >
-              <Controller
-                as={VLocationSelector}
-                control={control}
-                textInputStyle={[
-                  styles(theme, settings).inputView,
-                  errors[fields[key]["fields"][field].name] && {
-                    borderColor: "red",
-                    borderLeftWidth: 5,
-                  },
-                ]}
+              <VLocationSelector
+                textInputStyle={styles(theme, settings).inputView}
+                errors={errors}
+                errorStyle={styles(theme, settings).errorMessage}
                 name={fields[key]["fields"][field].name}
-                modalStyle={{
-                  backgroundColor: settings.options.main_color,
-                }}
-                style={{
-                  height: 50,
-                  backgroundColor: "#ccc",
-                  borderWidth: 1,
-                  width: "80%",
-                  alignItems: "center",
-                  margin: 10,
-                  borderRadius: 15,
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 5,
-                  },
-                  shadowOpacity: 0.24,
-                  shadowRadius: 2.27,
-
-                  elevation: 10,
-                }}
+                modalStyle={styles(theme, settings).cityModalStyle}
+                style={styles(theme, settings).cityFieldStyle}
                 placeholder="Выбрать город"
                 textColor={
                   theme === "dark"
                     ? settings.options.dark_mode_color5
                     : settings.options.light_mode_color5
                 }
-                onChangeName="onChangeValue"
                 onChangeValue={(value) => {
                   setValue(fields[key]["fields"][field].name, value, true);
                 }}
               />
-              <ErrorMessage
-                errors={errors}
-                name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
             </View>
           );
         } else if (
@@ -223,10 +153,10 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               key={fields[key]["fields"][field].title}
               style={styles(theme, settings).fieldContainer}
             >
-              <Controller
+              <VSwitch
                 key={fields[key]["fields"][field].title}
-                as={VSwitch}
-                control={control}
+                errors={errors}
+                errorStyle={styles(theme, settings).errorMessage}
                 name={fields[key]["fields"][field].name}
                 title={fields[key]["fields"][field].title}
                 switchStyle={styles(theme, settings).switch}
@@ -251,19 +181,9 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                 value={Boolean(watch(fields[key]["fields"][field].name))}
                 onChecked={(val) => {
                   console.log("val");
-                  setValue(fields[key]["fields"][field].name, val);
+                  setValue(fields[key]["fields"][field].name, val, true);
                 }}
               />
-              <ErrorMessage
-                errors={errors}
-                name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
             </View>
           );
         } else if (fields[key]["fields"][field].type === "telephone") {
@@ -272,19 +192,11 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               key={fields[key]["fields"][field].title}
               style={styles(theme, settings).fieldContainer}
             >
-              <Controller
-                as={VPhone}
-                control={control}
+              <VPhone
                 name={fields[key]["fields"][field].name}
-                onChangeName="onChangeValue"
-                style={StyleSheet.flatten([
-                  styles(theme, settings).inputView,
-
-                  errors[fields[key]["fields"][field].name] && {
-                    borderColor: "red",
-                    borderLeftWidth: 5,
-                  },
-                ])}
+                errorStyle={styles(theme, settings).errorMessage}
+                errors={errors}
+                style={styles(theme, settings).inputView}
                 textStyle={styles(theme, settings).inputText}
                 placeholderTextColor={
                   theme === "dark"
@@ -299,16 +211,6 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                   );
                 }}
               />
-              <ErrorMessage
-                errors={errors}
-                name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
             </View>
           );
         } else if (
@@ -321,7 +223,9 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               style={styles(theme, settings).fieldContainer}
             >
               <VDateTimePicker
-                // name={fields[key]["fields"][field].name + "[date]"}
+                errors={errors}
+                errorStyle={styles(theme, settings).errorMessage}
+                name={fields[key]["fields"][field].name}
                 cancelBtnTextColor={settings.options.main_color}
                 confirmBtnTextColor={settings.options.main_color}
                 onChangeValue={(text) => {
@@ -339,12 +243,9 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                   );
                 }}
                 mode="date"
-                pickerStyle={{
-                  backgroundColor:
-                    systemTheme === "dark"
-                      ? settings.options.dark_mode_color2
-                      : "#fff",
-                }}
+                pickerStyle={
+                  styles(theme, settings, systemTheme).datePickerStyle
+                }
                 locale="ru"
                 maximumDate={new Date()}
                 placeholder={
@@ -352,26 +253,10 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                     ? language.field_age_name
                     : fields[key]["fields"][field].title
                 }
-                style={StyleSheet.flatten([
-                  styles(theme, settings).inputView,
-
-                  errors[fields[key]["fields"][field].name] && {
-                    borderColor: "red",
-                    borderLeftWidth: 5,
-                  },
-                ])}
-                // modalStyle={{
-                //   backgroundColor:
-                //     theme === "dark"
-                //       ? settings.options.dark_mode_color2
-                //       : settings.options.light_mode_color2,
-                // }}
-                pickerContainerStyle={{
-                  backgroundColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color2
-                      : settings.options.light_mode_color2,
-                }}
+                style={styles(theme, settings).inputView}
+                pickerContainerStyle={
+                  styles(theme, settings).pickerContainerStyle
+                }
                 buttonStyle={[
                   styles(theme, settings).submitBtn,
                   { backgroundColor: settings.options.auth_submit_color },
@@ -388,16 +273,6 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                     : settings.options.light_mode_color2
                 }
               />
-              <ErrorMessage
-                errors={errors}
-                name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
             </View>
           );
         } else if (fields[key]["fields"][field].type === "image") {
@@ -406,111 +281,38 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               key={fields[key]["fields"][field].name}
               style={styles(theme, settings).fieldContainer}
             >
-              <Text
-                style={{
-                  marginHorizontal: 10,
-                  flex: 1,
-
-                  color:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color5
-                      : settings.options.light_mode_color5,
-                }}
-              >
+              <Text style={styles(theme, settings).imagePickerLabelStyle}>
                 {fields[key]["fields"][field].title}
               </Text>
               <VImagePicker
+                errors={errors}
+                name={fields[key]["fields"][field].name}
                 iconSize={36}
                 iconBeforeLoadColor={
                   theme === "dark"
                     ? settings.options.dark_mode_color4
                     : settings.options.light_mode_color4
                 }
-                textStyle={{
-                  marginHorizontal: 10,
-                  flex: 1,
-
-                  color:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color5
-                      : settings.options.light_mode_color5,
-                }}
-                placeholderStyle={{
-                  borderWidth: 1,
-
-                  width: 80,
-                  height: 80,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 15,
-                  backgroundColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color2
-                      : settings.options.light_mode_color4,
-                  borderColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color5
-                      : settings.options.light_mode_color5,
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 5,
-                  },
-                  shadowOpacity: 0.24,
-                  shadowRadius: 2.27,
-
-                  elevation: 15,
-                }}
-                styleMainContainer={{
-                  flex: 1,
-
-                  marginVertical: 10,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
+                textStyle={styles(theme, settings).imagePickerTextStyle}
+                placeholderStyle={
+                  styles(theme, settings).imagePickerPlaceholderStyle
+                }
+                styleMainContainer={
+                  styles(theme, settings).imagePickerMainContainerStyle
+                }
                 iconColor={
                   theme === "dark"
                     ? settings.options.dark_mode_color5
                     : settings.options.light_mode_color5
                 }
-                imageStyle={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 15,
-                }}
-                imageContainer={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 15,
-                  borderColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color2
-                      : settings.options.light_mode_color2,
-                  backgroundColor: settings.options.main_color,
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 5,
-                  },
-                  shadowOpacity: 0.24,
-                  shadowRadius: 2.27,
-                  elevation: 10,
-                }}
-                label={fields[key]["fields"][field].title}
-                onSelect={console.log}
+                imageStyle={styles(theme, settings).imagePickerImageStyle}
+                imageContainer={
+                  styles(theme, settings).imagePickerImageContainerStyle
+                }
+                onSelect={(data) =>
+                  setValue(fields[key]["fields"][field].name, data)
+                }
               />
-              <ErrorMessage
-                key={"error" + fields[key]["fields"][field].name}
-                errors={errors}
-                name={fields[key]["fields"][field].name}
-              >
-                {({ message }) => (
-                  <Text style={styles(theme, settings).errorMessage}>
-                    {message}
-                  </Text>
-                )}
-              </ErrorMessage>
             </View>
           );
         } else if (fields[key]["fields"][field].type === "images") {
@@ -524,78 +326,34 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
             images_views.push(
               <VImagePicker
                 key={fields[key]["fields"][field].title + i}
+                errors={errors}
+                name={fields[key]["fields"][field].name}
                 iconBeforeLoadColor={
                   theme === "dark"
                     ? settings.options.dark_mode_color4
                     : settings.options.light_mode_color4
                 }
                 iconSize={30}
-                placeholderStyle={{
-                  borderWidth: 1,
-
-                  width: 60,
-                  height: 60,
-                  marginRight: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 15,
-                  backgroundColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color2
-                      : settings.options.light_mode_color4,
-                  borderColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color5
-                      : settings.options.light_mode_color5,
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 5,
-                  },
-                  shadowOpacity: 0.24,
-                  shadowRadius: 2.27,
-
-                  elevation: 15,
-                }}
-                styleMainContainer={{
-                  flex: 1,
-
-                  marginVertical: 10,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
+                placeholderStyle={[
+                  styles(theme, settings).imagePickerPlaceholderStyle,
+                  { width: 60, height: 60, marginRight: 10 },
+                ]}
+                styleMainContainer={
+                  styles(theme, settings).imagePickerMainContainerStyle
+                }
                 iconColor={
                   theme === "dark"
                     ? settings.options.dark_mode_color5
                     : settings.options.light_mode_color5
                 }
-                imageStyle={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 15,
-                }}
-                imageContainer={{
-                  width: 60,
-                  height: 60,
-
-                  marginRight: 10,
-                  borderRadius: 15,
-                  borderColor:
-                    theme === "dark"
-                      ? settings.options.dark_mode_color2
-                      : settings.options.light_mode_color2,
-                  backgroundColor: settings.options.main_color,
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 5,
-                  },
-                  shadowOpacity: 0.24,
-                  shadowRadius: 2.27,
-                  elevation: 10,
-                }}
-                onSelect={console.log}
+                imageStyle={styles(theme, settings).imagesSetImageStyle}
+                imageContainer={[
+                  styles(theme, settings).imagePickerImageContainerStyle,
+                  { width: 60, height: 60 },
+                ]}
+                onSelect={(data) =>
+                  setValue(fields[key]["fields"][field].name, data)
+                }
               />
             );
           }
@@ -643,6 +401,7 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
   const fields_types = [
     "string",
     "list",
+    "email",
     "rules",
     "city",
     "telephone",
@@ -654,15 +413,16 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
   ];
 
   useEffect(() => {
-    let rules = {};
     Object.keys(fields).forEach((key) => {
       Object.keys(fields[key]["fields"]).forEach((field) => {
+        let rules = {};
         if (fields_types.includes(fields[key]["fields"][field].type)) {
           if (
             ["rules"] in fields[key]["fields"][field] &&
             fields[key]["fields"][field]["rules"].length > 0
           ) {
             fields[key]["fields"][field]["rules"].map(function (rule) {
+              console.log(field, rule[0]);
               if (rule[0] === "required") {
                 rules = { ...rules, required: language.field_error_required };
               }
@@ -684,7 +444,6 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
                   },
                 };
               }
-
               if (rule[0] === "email") {
                 rules = {
                   ...rules,
@@ -715,6 +474,7 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               rules
             );
           } else {
+            console.log(rules);
             register({ name: fields[key]["fields"][field].name }, rules);
           }
         }
@@ -738,21 +498,12 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
     });
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor:
-          theme === "dark"
-            ? settings.options.dark_mode_color4
-            : settings.options.light_mode_color4,
-      }}
-    >
+    <View style={styles(theme, settings).mainViewStyle}>
       <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-        }}
+        scrollEnabled={scrollable}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
       >
-        {fields ? fieldset : childrens}
+        {fields && fieldset}
         <View style={styles(theme, settings).fieldsetView}>
           <TouchableOpacity
             style={[
@@ -770,21 +521,26 @@ export const VForm = ({ fields, onSubmitForm, submitButtonTitle }) => {
               <ActivityIndicator color="white" style={{ marginLeft: 10 }} />
             )}
           </TouchableOpacity>
+          {children}
         </View>
       </ScrollView>
     </View>
   );
 };
 
-const styles = (theme, settings) =>
+const styles = (theme, settings, systemTheme) =>
   StyleSheet.create({
-    // pickerView: {
-    //   borderRadius: 25,
-    //   height: 30,
-
-    //   marginBottom: 5,
-    //   justifyContent: "center",
-    // },
+    mainViewStyle: {
+      flex: 1,
+      backgroundColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color4
+          : settings.options.light_mode_color4,
+    },
+    scrollViewStyle: {
+      flexGrow: 1,
+      flex: 1,
+    },
 
     fieldContainer: {
       flex: 1,
@@ -796,17 +552,13 @@ const styles = (theme, settings) =>
 
     inputView: {
       flex: 1,
-      borderTopWidth: 0,
-      borderLeftWidth: 0,
-      borderRightWidth: 0,
-      borderBottomWidth: 0.5,
-      // borderRadius: 50,
-
+      borderTopLeftRadius: 5,
+      borderBottomLeftRadius: 5,
       backgroundColor:
         theme === "dark"
           ? settings.options.dark_mode_color2
           : settings.options.light_mode_color2,
-      // borderBottomWidth: 0.5,
+      borderBottomWidth: 0.5,
       borderBottomColor:
         theme === "dark"
           ? settings.options.dark_mode_color5
@@ -816,17 +568,21 @@ const styles = (theme, settings) =>
       justifyContent: "center",
       paddingHorizontal: 10,
       paddingVertical: 10,
-      // shadowColor: "#000",
-      // shadowOffset: {
-      //   width: 0,
-      //   height: 0,
-      // },
-      // shadowOpacity: 0.24,
-      // shadowRadius: 2.27,
-
-      // elevation: 10,
     },
-
+    switch: {
+      borderTopWidth: 0,
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      borderBottomWidth: 0,
+      backgroundColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color2
+          : settings.options.light_mode_color2,
+      borderBottomColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color5
+          : settings.options.light_mode_color5,
+    },
     inputText: {
       marginLeft: 5,
       color:
@@ -858,15 +614,16 @@ const styles = (theme, settings) =>
     },
     errorMessage: {
       color: "red",
-      paddingLeft: 20,
+      paddingLeft: 5,
+      marginTop: 5,
       width: "80%",
       alignItems: "center",
       fontSize: 12,
-      marginBottom: 7,
+      marginBottom: 5,
     },
     submitBtn: {
       width: "80%",
-
+      height: 40,
       borderRadius: 15,
 
       alignItems: "center",
@@ -908,11 +665,120 @@ const styles = (theme, settings) =>
         theme === "dark"
           ? settings.options.dark_mode_color2
           : settings.options.light_mode_color2,
+    },
+    cityFieldStyle: {
+      height: 50,
+      backgroundColor: "#ccc",
+      borderWidth: 1,
+      width: "80%",
+      alignItems: "center",
+      margin: 10,
+      borderRadius: 15,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowOpacity: 0.24,
+      shadowRadius: 2.27,
 
-      // borderTopWidth: 0.3,
-      // borderTopColor:
-      //   theme === "dark"
-      //     ? settings.options.dark_mode_color5
-      //     : settings.options.light_mode_color5,
+      elevation: 10,
+    },
+
+    cityModalStyle: {
+      backgroundColor: settings.options.main_color,
+    },
+
+    datePickerStyle: {
+      backgroundColor:
+        systemTheme === "dark" ? settings.options.dark_mode_color2 : "#fff",
+    },
+
+    pickerContainerStyle: {
+      backgroundColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color2
+          : settings.options.light_mode_color2,
+    },
+    imagePickerTextStyle: {
+      marginHorizontal: 10,
+      flex: 1,
+
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color5
+          : settings.options.light_mode_color5,
+    },
+
+    imagePickerPlaceholderStyle: {
+      borderWidth: 1,
+
+      width: 80,
+      height: 80,
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: 15,
+      backgroundColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color2
+          : settings.options.light_mode_color4,
+      borderColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color5
+          : settings.options.light_mode_color5,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowOpacity: 0.24,
+      shadowRadius: 2.27,
+
+      elevation: 15,
+    },
+
+    imagePickerMainContainerStyle: {
+      flex: 1,
+      marginVertical: 10,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+
+    imagePickerImageStyle: {
+      width: 80,
+      height: 80,
+      borderRadius: 15,
+    },
+    imagesSetImageStyle: {
+      width: 60,
+      height: 60,
+      borderRadius: 15,
+    },
+    imagePickerImageContainerStyle: {
+      width: 80,
+      height: 80,
+      borderRadius: 15,
+      borderColor:
+        theme === "dark"
+          ? settings.options.dark_mode_color2
+          : settings.options.light_mode_color2,
+      backgroundColor: settings.options.main_color,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowOpacity: 0.24,
+      shadowRadius: 2.27,
+      elevation: 10,
+    },
+    imagePickerLabelStyle: {
+      marginHorizontal: 10,
+      flex: 1,
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color5
+          : settings.options.light_mode_color5,
     },
   });

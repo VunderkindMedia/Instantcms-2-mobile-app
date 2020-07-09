@@ -9,6 +9,7 @@ import {
   GET_CONTENT_ITEM,
   GET_MORE_CONTENT_ITEMS,
   RELOAD,
+  UPLOAD_ERROR,
   THEME,
 } from "./types";
 import { ThemeConsumer } from "react-native-elements";
@@ -62,6 +63,34 @@ export const AppState = ({ children }) => {
       const data = await response.json();
 
       dispatch({ type: GET_ICMS2_SETTINGS, settings: data.response });
+      return data.response;
+    } catch (e) {
+      console.log("Ошибка: " + e);
+      throw new Error(e);
+    }
+  };
+
+  const send_token = async (token) => {
+    try {
+      const response = await fetch(
+        BASE_URL +
+          "/api/method/api.add_notification_token.php?api_key=" +
+          API_KEY +
+          "&token=" +
+          token,
+        {
+          method: "POST",
+          credentials: "some-original",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: {},
+        }
+      );
+      const data = await response.json();
+
+      console.log("NOTIFICATION_TOKEN", data);
+      return data.response;
     } catch (e) {
       console.log("Ошибка: " + e);
       throw new Error(e);
@@ -70,11 +99,11 @@ export const AppState = ({ children }) => {
 
   const upload_photo = async (photoUri) => {
     let body = new FormData();
-    console.log(photoUri);
 
     body.append("photo", { uri: photoUri, type: "image/jpg", name: photoUri });
 
     try {
+      clearUploadError();
       const response = await fetch(
         BASE_URL +
           "/api/method/images.upload?api_key=" +
@@ -88,14 +117,25 @@ export const AppState = ({ children }) => {
         }
       );
       const data = await response.json();
-
-      return data.response;
-
       console.log(data);
+
+      if (data.response) {
+        return data.response;
+      } else if (data.error) {
+        setUploadError(data.error.error_msg);
+      }
     } catch (e) {
       console.log("Ошибка: " + e);
       throw new Error(e);
     }
+  };
+
+  const setUploadError = (e) => {
+    dispatch({ type: UPLOAD_ERROR, upload_error: e });
+  };
+
+  const clearUploadError = () => {
+    dispatch({ type: UPLOAD_ERROR, upload_error: null });
   };
 
   const get_items_list = async (ctype, page, filter = {}) => {
@@ -202,6 +242,8 @@ export const AppState = ({ children }) => {
         setTheme,
         reload,
         upload_photo,
+        send_token,
+        upload_error: state.upload_error,
       }}
     >
       {children}

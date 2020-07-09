@@ -91,8 +91,6 @@ grep -E "com.facebook.react:react-native:\\+" "${project_name}/android/app/build
 
 success "New sample project generated at /tmp/${project_name}"
 
-cd "/tmp/${project_name}" 
-
 info "Test the following on Android:"
 info "   - Disable Fast Refresh. It might be enabled from last time (the setting is stored on the device)"
 info "   - Verify 'Reload JS' works"
@@ -100,7 +98,7 @@ info ""
 info "Press any key to run the sample in Android emulator/device"
 info ""
 read -n 1
-yarn react-native run-android
+cd "/tmp/${project_name}" && react-native run-android
 
 info "Test the following on iOS:"
 info "   - Disable Fast Refresh. It might be enabled from last time (the setting is stored on the device)"
@@ -113,7 +111,7 @@ info ""
 info "Press any key to open the project in Xcode"
 info ""
 read -n 1
-yarn react-native run-ios
+open "/tmp/${project_name}/ios/${project_name}.xcodeproj"
 
 cd "$repo_root"
 

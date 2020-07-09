@@ -4,6 +4,7 @@ import {
   GET_CONTENT_ITEM,
   GET_MORE_CONTENT_ITEMS,
   RELOAD,
+  UPLOAD_ERROR,
   THEME,
 } from "./types";
 
@@ -21,6 +22,7 @@ export const initialState = {
   login_error: null,
   isAuth: false,
   theme: "light",
+  upload_error: null,
 };
 
 export default function AppReducer(state, action) {
@@ -49,6 +51,8 @@ export default function AppReducer(state, action) {
       return { ...state, rel: !state.rel };
     case THEME:
       return { ...state, theme: action.theme };
+    case UPLOAD_ERROR:
+      return { ...state, upload_error: action.upload_error };
     default:
       return state;
   }

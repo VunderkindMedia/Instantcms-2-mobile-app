@@ -8,3 +8,4 @@ export const LOGIN_ERROR = "LOGIN_ERROR";
 export const IS_AUTH = "IS_AUTH";
 export const RELOAD = "RELOAD";
 export const THEME = "THEME";
+export const UPLOAD_ERROR = "UPLOAD_ERROR";

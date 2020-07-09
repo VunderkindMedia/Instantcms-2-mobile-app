@@ -6,6 +6,8 @@ import { AppState } from "./context/app/AppState";
 
 import { MainScreen } from "./MainScreen";
 import { AuthState } from "./context/auth/AuthState";
+import { CommentsContext } from "./context/comments/CommentsContext";
+import { CommentsState } from "./context/comments/CommentsState";
 
 export default function App() {
   const [isReady, setReady] = useState(false);
@@ -22,9 +24,11 @@ export default function App() {
     return (
       <AppearanceProvider>
         <AppState>
-          <AuthState>
-            <MainScreen />
-          </AuthState>
+          <CommentsState>
+            <AuthState>
+              <MainScreen />
+            </AuthState>
+          </CommentsState>
         </AppState>
       </AppearanceProvider>
     );

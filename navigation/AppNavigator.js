@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-
+import React, { useContext, useEffect } from "react";
+import { Text } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import {
   NavigationContainer,
@@ -19,12 +19,14 @@ import { Categories } from "../screens/content/Categories";
 import { Filter } from "../screens/content/Filter";
 import { SignIn } from "../screens/Auth/SighIn";
 import { SignUp } from "../screens/Auth/SignUp.js";
-import { Animated } from "react-native";
+import { Comments } from "../screens/Comments/Comments";
+import { Remember } from "../screens/Auth/Remember";
+import { WebViewOn } from "../screens/WebViewOn";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-function ContentStack({ navigation, route }) {
+function MainStack({ navigation, route }) {
   const { settings } = useContext(AppContext);
   const forFade = ({ current }) => ({
     cardStyle: {
@@ -34,6 +36,7 @@ function ContentStack({ navigation, route }) {
 
   return (
     <Stack.Navigator
+      initialRouteName={route.params.screen}
       screenOptions={{
         headerTintColor: settings.options.main_color,
       }}
@@ -78,35 +81,36 @@ function ContentStack({ navigation, route }) {
           cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
         }}
       />
-    </Stack.Navigator>
-  );
-}
+      <Stack.Screen
+        name={"SignIn"}
+        component={SignIn}
+        options={{ title: "Авторизация" }}
+      />
+      <Stack.Screen
+        name={"SignUp"}
+        component={SignUp}
+        options={{ title: "Регистрация" }}
+      />
+      <Stack.Screen
+        name={"Remember"}
+        component={Remember}
+        options={{ title: "Восстановление пароля" }}
+      />
 
-export function SettingsStack({ route }) {
-  const { settings } = useContext(AppContext);
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerTintColor: settings.options.main_color,
-      }}
-    >
+      <Stack.Screen
+        name={"Comments"}
+        component={Comments}
+        mode="modal"
+        options={{
+          title: "Комментарии",
+          cardStyleInterpolator: forFade,
+        }}
+      />
       <Stack.Screen
         name={"Settings"}
         component={Settings}
         options={{ title: "Настройки" }}
       />
-    </Stack.Navigator>
-  );
-}
-
-export function CountersStack({ route }) {
-  const { settings } = useContext(AppContext);
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerTintColor: settings.options.main_color,
-      }}
-    >
       <Stack.Screen
         name={"Counters"}
         component={Counters}
@@ -121,52 +125,36 @@ export function CountersStack({ route }) {
   );
 }
 
-export function AuthStack({ route }) {
-  const { settings } = useContext(AppContext);
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerTintColor: settings.options.main_color,
-      }}
-    >
-      <Stack.Screen
-        name={"SignIn"}
-        component={SignIn}
-        options={{ title: "Авторизация" }}
-      />
-      <Stack.Screen
-        name={"SignUp"}
-        component={SignUp}
-        options={{ title: "Регистрация" }}
-      />
-    </Stack.Navigator>
-  );
-}
-
 function DrawerMenu() {
   const { settings } = useContext(AppContext);
   var initial_menu = [];
+  let reorder_menu = { menu: {} };
 
-  for (var id in settings.menu) {
-    if (settings.menu[id].is_enabled === "1") {
-      initial_menu.push(
-        <Drawer.Screen
-          key={id}
-          name={settings.menu[id].url}
-          component={ContentStack}
-          options={{
-            drawerLabel: settings.menu[id].title,
-            drawerIcon: settings.menu[id].options.class,
-            unmountOnBlur: true,
-          }}
-          initialParams={{
-            url: settings.menu[id].url,
-            title: settings.menu[id].title,
-          }}
-        />
-      );
-    }
-  }
+  Object.keys(settings.menu)
+    .sort(function (a, b) {
+      return settings.menu[a].ordering - settings.menu[b].ordering;
+    })
+    .forEach(function (v) {
+      if (settings.menu[v].is_enabled === "1") {
+        initial_menu.push(
+          <Drawer.Screen
+            key={v}
+            name={settings.menu[v].url}
+            component={MainStack}
+            options={{
+              drawerLabel: settings.menu[v].title,
+              drawerIcon: settings.menu[v].options.class,
+              unmountOnBlur: true,
+            }}
+            initialParams={{
+              screen: "List",
+              url: settings.menu[v].url,
+              title: settings.menu[v].title,
+            }}
+          />
+        );
+      }
+    });
 
   return (
     <Drawer.Navigator
@@ -180,9 +168,10 @@ function DrawerMenu() {
         <Drawer.Screen
           key={"first"}
           name={"auth"}
-          component={AuthStack}
+          component={MainStack}
           initialParams={{
             title: "Авторизация",
+            screen: "SignIn",
           }}
           options={{
             drawerLabel: "Авторизация",
@@ -207,9 +196,10 @@ function DrawerMenu() {
       <Drawer.Screen
         key="last"
         name="settings"
-        component={SettingsStack}
+        component={MainStack}
         initialParams={{
           title: "Настройки",
+          screen: "Settings",
         }}
         options={{
           unmountOnBlur: true,
@@ -222,6 +212,14 @@ function DrawerMenu() {
 }
 
 export const AppNav = ({}) => {
+  const linking = {
+    prefixes: ["https://mychat.com", "mychat://"],
+    config: {
+      screens: {
+        Comments: "comments",
+      },
+    },
+  };
   const { theme, settings } = useContext(AppContext);
   const darkTheme = {
     ...DefaultTheme,
@@ -244,9 +242,17 @@ export const AppNav = ({}) => {
       background: settings.options.light_mode_color2,
     },
   };
-  return (
-    <NavigationContainer theme={theme === "dark" ? darkTheme : defaultTheme}>
-      <DrawerMenu />
-    </NavigationContainer>
-  );
+  if (settings.options.webview_on) {
+    return <WebViewOn />;
+  } else {
+    return (
+      <NavigationContainer
+        linking={linking}
+        fallback={<Text>Loading...</Text>}
+        theme={theme === "dark" ? darkTheme : defaultTheme}
+      >
+        <DrawerMenu />
+      </NavigationContainer>
+    );
+  }
 };

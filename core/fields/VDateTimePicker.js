@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, Text, Platform, Modal } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { language } from "../language";
-import { format } from "../../utils/utils";
+import { useForm, Controller, ErrorMessage } from "react-hook-form";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -31,6 +31,9 @@ export const VDateTimePicker = ({
   locale,
   onChangeValue,
   backgroundCancelBtn,
+  errors,
+  name,
+  errorStyle,
 }) => {
   const [date, setDate] = useState(new Date());
 
@@ -68,7 +71,15 @@ export const VDateTimePicker = ({
   };
 
   return (
-    <View style={style}>
+    <View
+      style={[
+        style,
+        errors[name] && {
+          borderColor: "red",
+          borderLeftWidth: 5,
+        },
+      ]}
+    >
       <TouchableOpacity
         style={{ height: "100%", width: "100%", justifyContent: "center" }}
         onPress={() => setShow(true)}
@@ -77,6 +88,9 @@ export const VDateTimePicker = ({
           {placeholder + ": " + date.toLocaleDateString("RU-ru", options)}
         </Text>
       </TouchableOpacity>
+      <ErrorMessage errors={errors} name={name}>
+        {({ message }) => <Text style={errorStyle}>{message}</Text>}
+      </ErrorMessage>
       <DateTimePickerModal
         is24Hour={is24Hour}
         isVisible={show}

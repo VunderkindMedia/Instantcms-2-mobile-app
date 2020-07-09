@@ -3,23 +3,19 @@
     "name": "InstantCMS 2 MobileApp",
     "slug": "VunderkindMedia_InstantCMS_2_MobileApp",
     "privacy": "public",
-    "sdkVersion": "37.0.0",
     "platforms": [
       "ios",
       "android"
     ],
-
     "userInterfaceStyle": "automatic",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
@@ -29,17 +25,30 @@
       "**/*"
     ],
     "ios": {
-
       "supportsTablet": true,
       "bundleIdentifier": "com.vunderkind.media",
-      "buildNumber": "1.0.0"
-
-
+      "buildNumber": "1.0.2",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Эти слова по русски"
+      }
     },
     "android": {
       "package": "com.vunderkind.media",
-      "versionCode": 1
-
+      "useNextNotificationsApi": true,
+      "versionCode": 2,
+      "googleServicesFile": "./google-services.json",
+      "intentFilters": [{
+        "action": "VIEW",
+        "data": [{
+          "scheme": "https",
+          "host": "*.okha65.ru",
+          "pathPrefix": "/records"
+        }],
+        "category": [
+          "BROWSABLE",
+          "DEFAULT"
+        ]
+      }]
     }
   }
 }

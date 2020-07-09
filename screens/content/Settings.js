@@ -139,11 +139,21 @@ export const ThemeSwitcher = ({
           {title}
         </Text>
         <VSwitch
-          containerStyle={{ margin: 5, padding: 0 }}
+          wrapperStyle={{
+            justifyContent: "space-between",
+          }}
+          containerStyle={{
+            margin: 5,
+            padding: 0,
+            height: 20,
+          }}
           value={numThemeSwitch === numSwitch}
           onChecked={() => {
             onChange();
           }}
+          errors={{}}
+          name={""}
+          message={null}
           iconSize={16}
         />
       </View>

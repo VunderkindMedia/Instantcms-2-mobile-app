@@ -10,6 +10,7 @@ import {
   Modal,
 } from "react-native";
 import { BlurView } from "expo-blur";
+import { useForm, Controller, ErrorMessage } from "react-hook-form";
 
 import PropTypes from "prop-types";
 
@@ -101,7 +102,15 @@ class VDropDownPicker extends React.Component {
   }
 
   render() {
-    const { defaultNull, placeholder, disabled, value } = this.props;
+    const {
+      defaultNull,
+      placeholder,
+      disabled,
+      value,
+      errors,
+      errorStyle,
+      message,
+    } = this.props;
 
     const label =
       value !== undefined
@@ -113,7 +122,15 @@ class VDropDownPicker extends React.Component {
         : this.state.choice.label;
     const opacity = disabled ? 0.5 : 1;
     return (
-      <View style={this.props.style}>
+      <View
+        style={[
+          this.props.style,
+          errors[this.props.name] && {
+            borderColor: "red",
+            borderLeftWidth: 5,
+          },
+        ]}
+      >
         <TouchableOpacity
           onLayout={(event) => {
             this.getLayout(event.nativeEvent.layout);
@@ -144,7 +161,11 @@ class VDropDownPicker extends React.Component {
             </View>
           )}
         </TouchableOpacity>
-
+        <ErrorMessage errors={this.props.errors} name={this.props.name}>
+          {({ message }) => (
+            <Text style={this.props.errorStyle}>{message}</Text>
+          )}
+        </ErrorMessage>
         <Modal
           animationType={this.props.animation}
           transparent={true}

@@ -1,14 +1,68 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { AppContext } from "./context/app/AppContext";
-import { Notifications } from "expo";
+import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
+import Constants from "expo-constants";
 import { View, ActivityIndicator, StatusBar, Settings } from "react-native";
 
 import { AppNav } from "./navigation/AppNavigator";
 import { ErrorView } from "./screens/content/ErrorView";
 
 export const MainScreen = () => {
-  const { get_icms2_settings, rel, theme, settings } = useContext(AppContext);
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+
+  registerForPushNotificationsAsync = async () => {
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+
+      Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+          allowAnnouncements: true,
+        },
+      });
+      Notifications.getExpoPushTokenAsync().then((result) => {
+        console.log(result);
+        send_token(result.data);
+      });
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+  };
+
+  const { get_icms2_settings, rel, theme, settings, send_token } = useContext(
+    AppContext
+  );
   const [error, setError] = useState(false);
   const [ready, setReady] = useState(false);
   const onErrorHandle = () => {
@@ -42,9 +96,22 @@ export const MainScreen = () => {
   // }, []);
 
   useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log(notification);
+      }
+    );
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
     setReady(false);
     get_icms2_settings()
       .then((result) => {
+        console.log(result.user_info);
+        if (result.user_info.id) {
+          registerForPushNotificationsAsync();
+        }
         setReady(true);
       })
       .catch((error) => {
@@ -70,7 +137,13 @@ export const MainScreen = () => {
           //     ? settings.options.dark_mode_color2
           //     : settings.options.light_mode_color2
           // }
-          barStyle={theme === "dark" ? "light-content" : "dark-content"}
+          barStyle={
+            settings.options.webview_on
+              ? "dark-content"
+              : theme === "dark"
+              ? "light-content"
+              : "dark-content"
+          }
         />
         <AppNav />
       </View>

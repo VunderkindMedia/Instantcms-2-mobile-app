@@ -37,6 +37,7 @@ export const SignUp = () => {
       toValue: 1,
       easing: Easing.bounce,
       duration: 1500,
+      useNativeDriver: true,
     }).start();
     // Animated.timing(animation, {
     //   toValue: 1,
@@ -102,6 +103,7 @@ export const SignUp = () => {
 
         <VForm
           fields={sign_fields}
+          scrollable={true}
           submitButtonTitle={language.submit_button_title}
           onSubmitForm={console.log}
         />

@@ -8,6 +8,8 @@ import {
   StyleSheet,
   ImageBackground,
   ActivityIndicator,
+  ToastAndroid,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -33,11 +35,12 @@ const VImagePicker = ({
   placeholderStyle,
   onSelect,
   label,
+  errors,
+  name,
 }) => {
-  const { Popover } = renderers;
   const [image, setImage] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
-  const { upload_photo } = useContext(AppContext);
+  const { upload_photo, upload_error } = useContext(AppContext);
   useEffect(() => {
     (async () => {
       if (Constants.platform.ios) {
@@ -51,9 +54,17 @@ const VImagePicker = ({
     })();
   }, []);
 
+  useEffect(() => {
+    if (upload_error) {
+      if (Platform.OS === "android") {
+        ToastAndroid.show(upload_error, ToastAndroid.SHORT);
+      } else {
+        Alert.alert(upload_error);
+      }
+    }
+  }, [upload_error]);
+
   const pickImage = async (type) => {
-    setImage(null);
-    setImageLoading(true);
     let result;
     if (type === "camera") {
       result = await ImagePicker.launchCameraAsync({
@@ -80,12 +91,18 @@ const VImagePicker = ({
     console.log(result);
 
     if (!result.cancelled) {
+      setImage(null);
+      setImageLoading(true);
       // setImage(result.uri);
       // onSelect(result.uri);
       upload_photo(result.uri).then((data) => {
-        setImage(data.host + data.items.small);
-        onSelect(result.uri);
-        setImageLoading(false);
+        if (data) {
+          setImage(data.host + data.items.small);
+          onSelect(result.uri);
+          setImageLoading(false);
+        } else {
+          setImageLoading(false);
+        }
       });
     } else {
       imageLoading;
@@ -93,11 +110,7 @@ const VImagePicker = ({
   };
   return (
     <View style={styleMainContainer}>
-      {/* <Text numberOfLines={1} style={textStyle}>
-        {label}
-      </Text> */}
       <TouchableOpacity
-        //onPress={pickImage}
         onPress={() => {
           Alert.alert(
             "Откуда возьмем изображение?",
@@ -108,19 +121,25 @@ const VImagePicker = ({
                 onPress: () => pickImage("library"),
               },
               { text: "Камера", onPress: () => pickImage("camera") },
-              // {
-              //   text: "Отмена",
-              //   onPress: () => console.log("Cancel Pressed"),
-              //   style: "cancel",
-              // },
+              {
+                text: "Отмена",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
             ],
             { cancelable: false }
           );
         }}
       >
-        {!image && imageLoading === false ? (
-          <View style={placeholderStyle}>
-            <Ionicons size={iconSize} name={"ios-camera"} color={iconColor} />
+        {!image ? (
+          <View
+            style={[placeholderStyle, errors[name] && { borderColor: "red" }]}
+          >
+            {imageLoading ? (
+              <ActivityIndicator />
+            ) : (
+              <Ionicons size={iconSize} name={"ios-camera"} color={iconColor} />
+            )}
           </View>
         ) : (
           <ImageBackground

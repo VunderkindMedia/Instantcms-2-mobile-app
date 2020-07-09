@@ -13,6 +13,7 @@ export const language = {
   years_ago: "лет",
   submit_button_title: "Авторизация",
   register_button_title: "Регистрация",
+  remember_button_title: "Забыли пароль?",
   theme_dark: "Темная тема",
   theme_light: "Светлая тема",
   theme_system: "Системная тема",
