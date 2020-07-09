@@ -50,7 +50,7 @@ export const AppState = ({ children }) => {
   const get_icms2_settings = async () => {
     try {
       const response = await fetch(
-        BASE_URL + "/api/method/api.settingsget.php?api_key=" + API_KEY,
+        BASE_URL + "/api/method/mobileapp.settings.php?api_key=" + API_KEY,
         {
           method: "POST",
           credentials: "some-original",
@@ -61,6 +61,7 @@ export const AppState = ({ children }) => {
         }
       );
       const data = await response.json();
+      console.log(data);
 
       dispatch({ type: GET_ICMS2_SETTINGS, settings: data.response });
       return data.response;
@@ -74,7 +75,7 @@ export const AppState = ({ children }) => {
     try {
       const response = await fetch(
         BASE_URL +
-          "/api/method/api.add_notification_token.php?api_key=" +
+          "/api/method/mobileapp.add_notification_token.php?api_key=" +
           API_KEY +
           "&token=" +
           token,
@@ -139,7 +140,7 @@ export const AppState = ({ children }) => {
   };
 
   const get_items_list = async (ctype, page, filter = {}) => {
-    let url = BASE_URL + "/api/method/content.get." + ctype;
+    let url = BASE_URL + "/api/method/mobileapp.get_content_list." + ctype;
 
     const form = new FormData();
     form.append("api_key", API_KEY);

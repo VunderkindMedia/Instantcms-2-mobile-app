@@ -15,7 +15,7 @@ export const CommentsState = ({ children }) => {
     try {
       const response = await fetch(
         BASE_URL +
-          "/api/method/comments.get?api_key=" +
+          "/api/method/mobileapp.comments_get?api_key=" +
           API_KEY +
           "&target_controller=" +
           target_controller +

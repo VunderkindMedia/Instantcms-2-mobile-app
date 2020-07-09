@@ -20,6 +20,7 @@ import { BASE_URL } from "../../config/consts";
 import { WebView } from "react-native-webview";
 import HTML from "react-native-render-html";
 import { CommentIcon } from "../Comments/childs/CommentIcon";
+import { Comments } from "../Comments/Comments";
 
 export const Item = ({ route, navigation }) => {
   const { get_item, item_res, settings, theme } = useContext(AppContext);
@@ -292,6 +293,22 @@ export const Item = ({ route, navigation }) => {
 
         {fields}
         <InfoBar />
+        <View style={styles(theme, settings).commentsView}>
+          <Ionicons
+            size={16}
+            style={styles(theme, settings).commentsViewIcon}
+            name="ios-megaphone"
+          />
+          <Text style={styles(theme, settings).commentsViewTitle}>
+            Комментарии:
+          </Text>
+        </View>
+        <Comments
+          route={route}
+          target_controller="content"
+          target_subject={route.params.ctype}
+          target_id={route.params.item_id}
+        />
       </ScrollView>
     );
   } else {
@@ -345,6 +362,25 @@ export const styles = (theme, settings) => {
     txtFieldValue: {
       flex: 1,
 
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+    },
+    commentsView: {
+      flex: 1,
+      padding: 10,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    commentsViewIcon: {
+      color:
+        theme === "dark"
+          ? settings.options.dark_mode_color1
+          : settings.options.light_mode_color1,
+      marginHorizontal: 10,
+    },
+    commentsViewTitle: {
       color:
         theme === "dark"
           ? settings.options.dark_mode_color1

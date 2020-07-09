@@ -5,44 +5,43 @@ import {
   ListView,
   ActivityIndicator,
   FlatList,
+  SafeAreaView,
 } from "react-native";
 import { CommentsContext } from "../../context/comments/CommentsContext";
 import { AppContext } from "../../context/app/AppContext";
 import { Comment } from "./childs/Comment";
 
-export const Comments = ({ navigation, route }) => {
-  const { theme, settings } = useContext(AppContext);
+export const Comments = ({ target_controller, target_subject, target_id }) => {
   const { getComments, commentsLoading, comments_list_response } = useContext(
     CommentsContext
   );
 
   useEffect(() => {
-    getComments(
-      route.params.target_controller,
-      route.params.target_subject,
-      route.params.target_id
-    );
+    getComments(target_controller, target_subject, target_id);
   }, []);
 
   if (!commentsLoading && comments_list_response.items.length !== 0) {
+    let comments_list = [];
+    comments_list_response.items.map((item) => {
+      comments_list.push(
+        <Comment key={item.date_pub + item.content} item={item} />
+      );
+    });
     return (
-      <View>
-        <FlatList
-          style={{
-            marginVertical: 5,
-            backgroundColor:
-              theme === "dark"
-                ? settings.options.dark_mode_color3
-                : settings.options.light_mode_color3,
-          }}
-          data={comments_list_response.items}
-          renderItem={(data) => <Comment item={data.item} />}
-        />
-      </View>
+      <SafeAreaView style={{ marginVertical: 10, flex: 1 }}>
+        {comments_list}
+      </SafeAreaView>
     );
   } else if (!commentsLoading && comments_list_response.items.length === 0) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginVertical: 20,
+        }}
+      >
         <Text style={{ color: "#fff" }}>Комментарии отстутсвуют</Text>
       </View>
     );
