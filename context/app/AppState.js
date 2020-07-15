@@ -161,6 +161,7 @@ export const AppState = ({ children }) => {
 
       const data = await response.json();
 
+      console.log(data);
       if (page > 1) {
         dispatch({
           type: GET_MORE_CONTENT_ITEMS,

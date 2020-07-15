@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { formattingDate } from "../../../utils/utils";
 import JsxParser from "react-jsx-parser";
 import TouchableView from "../../../utils/utils";
+import { SliderOWL } from "./SliderOWL";
 
 export const ItemRow = ({ data, ctype, navigation, title }) => {
   const { settings, theme } = useContext(AppContext);

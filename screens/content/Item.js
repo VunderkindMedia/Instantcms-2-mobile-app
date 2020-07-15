@@ -157,18 +157,6 @@ export const Item = ({ route, navigation }) => {
   }
 
   if (!loading) {
-    navigation.setOptions({
-      headerRight: () => (
-        <CommentIcon
-          route={route}
-          iconColor={settings.options.main_color}
-          navigation={navigation}
-          id={item_res.item.id}
-          subject={route.params.ctype}
-          controller={"content"}
-        />
-      ),
-    });
     //Парсим фото в слайдер
     if (item_res.item.photo && item_res.item.photo.normal) {
       images = [...images, item_res.item.photo.normal];
